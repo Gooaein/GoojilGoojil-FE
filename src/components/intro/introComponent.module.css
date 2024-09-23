@@ -1,0 +1,75 @@
+.container {
+  width: 100%;
+  background: linear-gradient(to bottom, #60a5fa, #a78bfa, #ac7613);
+  overflow-x: hidden;
+  scroll-behavior: smooth;
+}
+
+.section {
+  height: 100vh;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0 3%;
+  position: relative;
+  overflow: hidden;
+}
+
+.textWrapper {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  z-index: 10;
+}
+
+.text {
+  color: white;
+  font-size: 1.875rem;
+  font-weight: bold;
+  max-width: 80%;
+  margin-bottom: 1rem;
+}
+
+.subText {
+  color: rgba(255, 255, 255, 0.8);
+  font-size: 1.25rem;
+  max-width: 70%;
+  margin-bottom: 2rem;
+}
+
+.cloud {
+  position: absolute;
+  transition: all 0.4s ease-in;
+}
+
+.cloudLeft {
+  left: 0;
+}
+
+.cloudRight {
+  right: 0;
+}
+
+.buttonContainer {
+  display: flex;
+  gap: 1rem;
+}
+
+.button {
+  background-color: white;
+  color: #8b5cf6;
+  padding: 0.5rem 1.5rem;
+  border-radius: 9999px;
+  border: none;
+  cursor: pointer;
+  font-weight: bold;
+  transition: all 0.3s ease;
+}
+
+.button:hover {
+  background-color: #8b5cf6;
+  color: white;
+}
