@@ -4,8 +4,15 @@ import "aos/dist/aos.css";
 import styles from "./introComponent.module.css";
 import { BUTTON_LABELS, INTRO_CONTENT } from "../../constants/introContent";
 import { generateCloud } from "../../util/generateCloud";
+import { useNavigate } from "react-router-dom";
 
 const IntroComponent = () => {
+  const navigate = useNavigate();
+
+  function handleJoinButton() {
+    navigate("/customize");
+  }
+
   useEffect(() => {
     AOS.init({
       duration: 1000,
@@ -34,7 +41,7 @@ const IntroComponent = () => {
               <button className={styles.button}>
                 {BUTTON_LABELS.CREATE_ROOM}
               </button>
-              <button className={styles.button}>
+              <button className={styles.button} onClick={handleJoinButton}>
                 {BUTTON_LABELS.JOIN_ROOM}
               </button>
             </div>
