@@ -1,0 +1,60 @@
+.controls {
+  width: 60%;
+  max-width: 500px; 
+  margin-right: 10%;
+}
+
+.featureOptions {
+  margin-bottom: 20px;
+}
+
+.featureOptions h3 {
+  margin-bottom: 10px;
+  text-align: center;
+}
+
+.optionsGrid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 10px;
+}
+
+.optionButton {
+  background: none;
+  border: 2px solid #ccc;
+  border-radius: 5px;
+  padding: 5px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.optionButton:hover {
+  border-color: #a0d8ef;
+}
+
+.optionButton.selected {
+  border-color: #4a90e2;
+  box-shadow: 0 0 5px rgba(74, 144, 226, 0.5);
+}
+
+.optionButton img {
+  width: 100%;
+  height: auto;
+}
+
+.saveButton {
+  display: block;
+  width: 100%;
+  padding: 10px;
+  background-color: #4a90e2;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  font-size: 16px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.saveButton:hover {
+  background-color: #357abd;
+}
