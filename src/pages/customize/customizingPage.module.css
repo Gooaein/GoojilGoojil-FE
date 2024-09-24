@@ -1,0 +1,6 @@
+.customizingPageContainer {
+  height: 100vh;
+  background: linear-gradient(to bottom, #577ef5, #98b2ff);
+  overflow-x: hidden;
+  scroll-behavior: smooth;
+}

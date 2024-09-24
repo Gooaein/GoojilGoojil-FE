@@ -6,7 +6,7 @@ export const WaterDrop = () => {
   const character = useRecoilValue(characterState);
 
   return (
-    <div className={styles.container}>
+    <div className={styles.container} data-aos="fade-up" data-aos-delay="500">
       <div
         className={styles.waterDrop}
         style={{ backgroundImage: `url(${character.body})` }}
