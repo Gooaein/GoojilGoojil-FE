@@ -1,14 +1,21 @@
-import React from "react";
-
-import { Home, Info, Mail } from "lucide-react";
-
-import styles from "./Header.module.css";
-import HeaderLogo from "../../assets/images/logo/headerLogo.png";
+import React, { useState } from "react";
+import { Home, Info, Mail, Users } from "lucide-react";
 import { useRecoilValue } from "recoil";
-import { userState } from "../../recoil/user-atoms";
 import { Link } from "react-router-dom";
+import styles from "./Header.module.css";
+import HeaderLogo from "../../../assets/images/logo/headerLogo.png";
+import { userState } from "../../../recoil/user-atoms";
+import { activeUsersState } from "../../../recoil/chat-atoms";
+import ActiveUsersContainer from "./components/ActiveUsersContainer";
+
 export const Header = () => {
-  let user = useRecoilValue(userState);
+  const user = useRecoilValue(userState);
+  const activeUsers = useRecoilValue(activeUsersState);
+  const [showActiveUsers, setShowActiveUsers] = useState(false);
+
+  const toggleActiveUsers = () => {
+    setShowActiveUsers(!showActiveUsers);
+  };
 
   return (
     <header className={styles.header}>
@@ -32,12 +39,19 @@ export const Header = () => {
                 </Link>
               </li>
             ))}
+            <li>
+              <button onClick={toggleActiveUsers} className={styles.navItem}>
+                <Users className={styles.icon} size={18} />
+                활성 사용자 ({activeUsers.length})
+              </button>
+            </li>
           </ul>
         </nav>
         {user && (
           <span className={styles.userName}>환영합니다, {user.name}님</span>
         )}
       </div>
+      {showActiveUsers && <ActiveUsersContainer />}
     </header>
   );
 };

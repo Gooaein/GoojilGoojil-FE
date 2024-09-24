@@ -42,6 +42,7 @@ ul {
   align-items: center;
   color: #4b5563;
   transition: color 0.2s;
+  background-color: #ffffff;
 }
 
 .navItem:hover {
