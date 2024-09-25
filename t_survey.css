@@ -1,0 +1,102 @@
+body {
+    margin: 0;
+    padding: 0;
+    background-color: white;
+    font-family: 'Arial', sans-serif;
+    overflow: hidden;
+}
+
+.header {
+    width: 100%;
+    height: 100px;
+    background-color: #ffffff;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0 40px;
+}
+
+.logo {
+    width: 137px;
+    height: 23px;
+}
+
+.seminar-info {
+    display: flex;
+    align-items: center;
+}
+
+.seminar-title {
+    font-size: 24px;
+    font-weight: bold;
+    margin-right: 20px;
+}
+
+.current-respondents {
+    font-size: 16px;
+    color: #767676;
+}
+
+.divider {
+    width: 100%; 
+    height: 1px; 
+    background-color: #D5D5D7; 
+    margin-top: 20px; 
+}
+
+.content {
+    padding: 40px 20px 20px 20px; 
+    text-align: center;
+}
+
+table {
+    margin: 20px auto; 
+    border-collapse: collapse;
+}
+
+th, td {
+    padding: 10px 20px;
+    text-align: left;
+    font-size: 16px;
+}
+
+th {
+    font-weight: bold;
+    border-bottom: 2px solid #ddd;
+}
+
+td {
+    vertical-align: middle;
+}
+
+.star {
+    width: 16px; 
+    height: 16px; 
+    margin-right: 5px; 
+}
+
+.big-rating {
+    font-size: 36px; 
+    font-weight: bold;
+    margin-top: 20px;
+    color: black;
+}
+
+.max-rating {
+    font-size: 14px; 
+    color: #767676; 
+}
+
+.back-button {
+    margin-top: 40px; 
+    padding: 10px 20px; 
+    background-color: #717FFF; 
+    color: #ffffff; 
+    border: 1px solid #5A5DBB;
+    border-radius: 45px; 
+    cursor: pointer; 
+}
+
+.back-button:hover {
+    background-color: #5a61db; 
+}
