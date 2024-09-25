@@ -1,5 +1,5 @@
 //질문 publish
-export const sendQuestion = (roomId, content, userId) => {
+export const sendQuestion = (roomId, content) => {
   const stompClient = window.stompClient;
   if (stompClient) {
     stompClient.publish({
@@ -7,7 +7,6 @@ export const sendQuestion = (roomId, content, userId) => {
       body: JSON.stringify({
         type: "question",
         content: content,
-        avartar_base64: "your_avatar_base64_here", // Replace with actual avatar
         send_time: new Date().toISOString(),
       }),
       headers: { "content-type": "application/json" },
@@ -16,7 +15,7 @@ export const sendQuestion = (roomId, content, userId) => {
 };
 
 //공감 publish
-export const sendLike = (questionId, userId) => {
+export const sendLike = (questionId) => {
   const stompClient = window.stompClient;
   if (stompClient) {
     stompClient.publish({
@@ -24,7 +23,6 @@ export const sendLike = (questionId, userId) => {
       body: JSON.stringify({
         type: "like",
         question_id: questionId,
-        avartar_base64: "your_avatar_base64_here", // Replace with actual avatar
         sendTime: new Date().toISOString(),
       }),
     });
@@ -38,7 +36,6 @@ export const sendJoinRoom = (client, roomId, userId) => {
     body: JSON.stringify({
       type: "in",
       guest_id: userId,
-      avartar_base64: "your_avatar_base64_here", // Replace with actual avatar
       sendTime: new Date().toISOString(),
     }),
   });
@@ -51,7 +48,6 @@ export const sendLeaveRoom = (client, roomId, userId) => {
     body: JSON.stringify({
       type: "out",
       guest_id: userId,
-      avartar_base64: "your_avatar_base64_here", // Replace with actual avatar
       sendTime: new Date().toISOString(),
     }),
   });
