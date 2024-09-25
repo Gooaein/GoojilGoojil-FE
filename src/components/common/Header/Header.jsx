@@ -44,6 +44,7 @@ export const Header = () => {
                 <Users className={styles.icon} size={18} />
                 활성 사용자 ({activeUsers.length})
               </button>
+              {showActiveUsers && <ActiveUsersContainer />}
             </li>
           </ul>
         </nav>
@@ -51,7 +52,6 @@ export const Header = () => {
           <span className={styles.userName}>환영합니다, {user.name}님</span>
         )}
       </div>
-      {showActiveUsers && <ActiveUsersContainer />}
     </header>
   );
 };
