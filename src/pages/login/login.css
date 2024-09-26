@@ -1,0 +1,53 @@
+body {
+    margin: 0;
+    height: 100vh;
+    display: flex;
+    justify-content: center; 
+    align-items: center; 
+    background: linear-gradient(to bottom, #577EF5 27%, #FFCACA 100%);
+    color: white; 
+    font-family: Arial, sans-serif; 
+    overflow: hidden; 
+}
+
+.header {
+    position: absolute;
+    top: 39px; 
+    left: 42px;
+}
+
+.logo {
+    width: 140px; 
+    height: 23.75px; 
+}
+
+.main-content {
+    position: absolute; 
+    top: 245px; 
+    text-align: center; 
+}
+
+h3 {
+    margin: 0;
+    font-size: 20px; 
+    line-height: 1.5; 
+}
+.social-buttons {
+    position: absolute; 
+    top: 400px;
+    display: flex; 
+    flex-direction: column; 
+    align-items: center; 
+    gap: 10px; 
+}
+
+.social-button img {
+    width: 200px; 
+    height: auto; 
+    cursor: pointer; 
+    transition: transform 0.3s; 
+}
+
+.social-button:hover img {
+    transform: scale(1.05); 
+}
