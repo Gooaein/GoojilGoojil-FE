@@ -1,0 +1,46 @@
+.container {
+  padding: 20px;
+}
+
+.title {
+  text-align: left;
+  font-size: 1.5em;
+  margin-top: 50px;
+  margin-bottom: 40px;
+}
+
+.table {
+  width: 1284px;
+  border-collapse: collapse;
+  margin: 0 auto;
+}
+
+th,
+td {
+  padding: 10px 15px;
+  text-align: center;
+  border: 2px solid #000000;
+}
+
+th {
+  background-color: #eeefff;
+  font-weight: 400;
+  font-size: 1.2em;
+}
+
+.copyButton {
+  padding: 5px 10px;
+  font-size: 0.9em;
+  background-color: #b8b8b8;
+  color: white;
+  border: none;
+  cursor: pointer;
+}
+
+.copyButton:hover {
+  background-color: #45a049;
+}
+
+tr:hover {
+  background-color: #f5f5f5;
+}

@@ -1,0 +1,59 @@
+.formContainer {
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start; /* 위쪽 정렬 */
+  align-items: center;
+  height: 100vh; /* 뷰포트 전체 높이를 사용 */
+  padding-top: 100px; /* 상단에 100px 만큼 여백 추가 */
+  background-color: #ffffff;
+  border-top: 1px solid #aaa; /* 위쪽 테두리 추가 */
+  position: relative;
+}
+
+.inputGroup {
+  margin-bottom: 30px;
+  width: 30%;
+}
+
+label {
+  margin-bottom: 25px; /* 레이블과 입력 박스 사이 간격을 더 넓힘 */
+  font-weight: bold;
+  font-size: 18px; /* 글자 굵기 */
+}
+
+.inputBox {
+  width: 100%; /* 입력 박스 너비 */
+  padding: 20px; /* 패딩 */
+  border: 1px solid #ccc; /* 테두리 */
+  border-radius: 8px; /* 둥근 모서리 */
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  font-size: 16px; /* 글자 크기 */
+}
+
+.inputBox::placeholder {
+  color: #aaa; /* 플레이스홀더 텍스트 색상 */
+}
+
+.buttonContainer {
+  display: flex;
+  gap: 1rem;
+  margin-top: 50px;
+  margin-left: 900px;
+}
+
+.button {
+  background-color: #717fff;
+  color: #ffffff;
+  padding: 0.7rem 1.5rem;
+  border-radius: 9999px;
+  border: none;
+  cursor: pointer;
+  font-weight: bold;
+  font-size: 18px;
+  transition: all 0.3s ease;
+}
+
+.button:hover {
+  background-color: #8b5cf6;
+  color: white;
+}
