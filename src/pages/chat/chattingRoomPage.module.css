@@ -1,44 +1,14 @@
 .container {
   padding: 20px;
-  height: 85%;
+  height: 88vh;
   background: linear-gradient(to bottom, #577ef5, #ffcaca);
-  margin: 0 auto;
   position: relative;
 }
 
-.title {
-  font-size: 24px;
-  font-weight: bold;
-  margin-bottom: 20px;
-}
-
-.avatar img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-}
-
-.questions {
-  margin-bottom: 20px;
-}
-
-.question {
-  background-color: #f0f0f0;
-  padding: 10px;
-  margin-bottom: 10px;
-  border-radius: 5px;
-}
-
-.likeButton {
-  background-color: #4caf50;
-  border: none;
-  color: white;
-  padding: 5px 10px;
-  text-align: center;
-  text-decoration: none;
-  display: inline-block;
-  font-size: 14px;
-  margin-top: 5px;
-  cursor: pointer;
-  border-radius: 3px;
+.cloudContainer {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 60px; /* Adjust based on your ChattingInput height */
 }

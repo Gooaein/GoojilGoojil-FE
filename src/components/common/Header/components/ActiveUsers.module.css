@@ -2,9 +2,18 @@
   margin-bottom: 20px;
 }
 
-.avatarContainer {
+.avatarGrid {
+  display: grid;
+  grid-template-columns: repeat(6, 1fr);
+  gap: 15px;
+  justify-content: center;
+}
+
+.avatarItem {
   display: flex;
-  flex-wrap: wrap;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
 }
 
 .avatar {
@@ -12,6 +21,32 @@
   height: 40px;
   border-radius: 50%;
   overflow: hidden;
-  margin-right: 10px;
-  margin-bottom: 10px;
+  margin-bottom: 5px;
+}
+
+.userName {
+  font-size: 12px;
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.emptyState {
+  text-align: center;
+  padding: 20px;
+  color: #666;
+}
+
+/* 반응형 디자인을 위한 미디어 쿼리 */
+@media (max-width: 768px) {
+  .avatarGrid {
+    grid-template-columns: repeat(4, 1fr);
+  }
+}
+
+@media (max-width: 480px) {
+  .avatarGrid {
+    grid-template-columns: repeat(3, 1fr);
+  }
 }

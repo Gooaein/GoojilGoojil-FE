@@ -1,11 +1,14 @@
 import { useEffect, useRef } from "react";
 import styles from "./ChattingInput.module.css";
 import useInput from "../../../hooks/useInput";
-import useChattingRoom from "../../../stomp/chat/useChattingRoom";
+
 import sendIcon from "../../../assets/images/chat/sendIcon.png";
+import useChattingRoom from "../../../stomp/chat/useChattingRoom";
+
 export const ChattingInput = () => {
   const textareaRef = useRef(null);
-  const { handleSendQuestion } = useChattingRoom();
+  //TODO- 나중에 실제 값으로 바꿔야 함.
+  const { handleSendQuestion } = useChattingRoom(1, 1, false);
   const questionInput = useInput("", (value) => {
     const colonIndex = value.indexOf(":");
 
