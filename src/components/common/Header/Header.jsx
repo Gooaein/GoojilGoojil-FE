@@ -18,40 +18,42 @@ export const Header = () => {
   };
 
   return (
-    <header className={styles.header}>
-      <div className={styles.container}>
-        <div className={styles.logoContainer}>
-          <Link to="/">
-            <img src={HeaderLogo} alt="로고" className={styles.logo} />
-          </Link>
-        </div>
-        <nav>
-          <ul className={styles.navList}>
-            {[
-              { name: "홈", icon: Home },
-              { name: "소개", icon: Info },
-              { name: "연락처", icon: Mail },
-            ].map((item) => (
-              <li key={item.name}>
-                <Link className={styles.navItem}>
-                  <item.icon className={styles.icon} size={18} />
-                  {item.name}
-                </Link>
+    <>
+      <header className={styles.header}>
+        <div className={styles.container}>
+          <div className={styles.logoContainer}>
+            <Link to="/">
+              <img src={HeaderLogo} alt="로고" className={styles.logo} />
+            </Link>
+          </div>
+          <nav>
+            <ul className={styles.navList}>
+              {[
+                { name: "홈", icon: Home },
+                { name: "소개", icon: Info },
+                { name: "연락처", icon: Mail },
+              ].map((item) => (
+                <li key={item.name}>
+                  <Link className={styles.navItem}>
+                    <item.icon className={styles.icon} size={18} />
+                    {item.name}
+                  </Link>
+                </li>
+              ))}
+              <li>
+                <button onClick={toggleActiveUsers} className={styles.navItem}>
+                  <Users className={styles.icon} size={18} />
+                  활성 사용자 ({activeUsers.length})
+                </button>
               </li>
-            ))}
-            <li>
-              <button onClick={toggleActiveUsers} className={styles.navItem}>
-                <Users className={styles.icon} size={18} />
-                활성 사용자 ({activeUsers.length})
-              </button>
-              {showActiveUsers && <ActiveUsersContainer />}
-            </li>
-          </ul>
-        </nav>
-        {user && (
-          <span className={styles.userName}>환영합니다, {user.name}님</span>
-        )}
-      </div>
-    </header>
+            </ul>
+          </nav>
+          {user && (
+            <span className={styles.userName}>환영합니다, {user.name}님</span>
+          )}
+        </div>
+      </header>
+      {showActiveUsers && <ActiveUsersContainer />}
+    </>
   );
 };
