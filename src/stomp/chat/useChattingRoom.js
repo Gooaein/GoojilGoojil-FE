@@ -1,27 +1,79 @@
 import { useCallback, useEffect, useRef } from "react";
 import { useRecoilState, useSetRecoilState } from "recoil";
 import { Client } from "@stomp/stompjs";
-
-import {
-  sendJoinRoom,
-  sendLeaveRoom,
-  sendLike,
-  sendQuestion,
-} from "./chat-stomp";
-
 import {
   activeUsersState,
   questionsState,
   stompClientState,
 } from "../../recoil/chat-atoms";
 import { QUESTION_LIFETIME } from "../../constants/questionLifeTime";
-import { MockStompClient } from "../../mocks/mockStompClient";
 
-const useChattingRoom = (roomId, userId) => {
+const useChattingRoom = (roomId, userId, isUseEffectOn) => {
   const [questions, setQuestions] = useRecoilState(questionsState);
   const setActiveUsers = useSetRecoilState(activeUsersState);
-  const setStompClient = useSetRecoilState(stompClientState);
+  const [, setStompClient] = useRecoilState(stompClientState);
   const timerRef = useRef({});
+  const clientRef = useRef(null);
+
+  const sendQuestion = (stompClient, roomId, title, content) => {
+    if (stompClient && stompClient.connected) {
+      stompClient.publish({
+        destination: `/app/rooms/${roomId}/questions`,
+        body: JSON.stringify({
+          title: title,
+          content: content,
+        }),
+        headers: { "content-type": "application/json" },
+      });
+    } else {
+      console.error("[sendQuestion] : STOMP client is not connected");
+    }
+  };
+
+  const sendLike = (stompClient, questionId, userId) => {
+    if (stompClient && stompClient.connected) {
+      stompClient.publish({
+        destination: `/app/likes/${questionId}`,
+        body: JSON.stringify({
+          type: "like",
+          question_id: questionId,
+          sendTime: new Date().toISOString(),
+          userId: userId,
+        }),
+      });
+    } else {
+      console.error("[sendLike] : STOMP client is not connected");
+    }
+  };
+
+  const sendJoinRoom = (stompClient, roomId) => {
+    if (stompClient && stompClient.connected) {
+      stompClient.publish({
+        destination: `/app/rooms/${roomId}/in`,
+        body: JSON.stringify({
+          type: "in",
+          sendTime: new Date().toISOString(),
+        }),
+      });
+    } else {
+      console.error("STOMP client is not connected");
+    }
+  };
+
+  const sendLeaveRoom = (stompClient, roomId, userId) => {
+    if (stompClient && stompClient.connected) {
+      stompClient.publish({
+        destination: `/app/rooms/${roomId}/out`,
+        body: JSON.stringify({
+          type: "out",
+          guest_id: userId,
+          sendTime: new Date().toISOString(),
+        }),
+      });
+    } else {
+      console.error("[sendLeaveRoom] : STOMP client is not connected");
+    }
+  };
 
   const removeExpiredQuestions = useCallback(() => {
     const now = Date.now();
@@ -29,31 +81,6 @@ const useChattingRoom = (roomId, userId) => {
       prevQuestions.filter((question) => question.expiresAt > now)
     );
   }, [setQuestions]);
-
-  const resetQuestionTimer = useCallback(
-    (questionId) => {
-      const expiresAt = Date.now() + QUESTION_LIFETIME;
-
-      // Clear existing timer if any
-      if (timerRef.current[questionId]) {
-        clearTimeout(timerRef.current[questionId]);
-      }
-
-      // Set new timer
-      timerRef.current[questionId] = setTimeout(() => {
-        removeExpiredQuestions();
-        delete timerRef.current[questionId];
-      }, QUESTION_LIFETIME);
-
-      // Update question's expiration time
-      setQuestions((prevQuestions) =>
-        prevQuestions.map((q) =>
-          q.question_id === questionId ? { ...q, expiresAt } : q
-        )
-      );
-    },
-    [setQuestions, removeExpiredQuestions]
-  );
 
   const updateQuestionTimers = useCallback(() => {
     const now = Date.now();
@@ -63,15 +90,29 @@ const useChattingRoom = (roomId, userId) => {
         remainingTime: Math.max(0, question.expiresAt - now),
       }))
     );
-  }, [setQuestions]);
+    removeExpiredQuestions();
+  }, [setQuestions, removeExpiredQuestions]);
 
+  const resetQuestionTimer = useCallback(
+    (questionId) => {
+      if (timerRef.current[questionId]) {
+        clearTimeout(timerRef.current[questionId]);
+      }
+
+      timerRef.current[questionId] = setTimeout(() => {
+        removeExpiredQuestions();
+        delete timerRef.current[questionId];
+      }, QUESTION_LIFETIME);
+    },
+    [removeExpiredQuestions]
+  );
   const handleSendQuestion = useCallback(
-    (content) => {
-      if (content) {
-        sendQuestion(roomId, content, userId);
+    (value) => {
+      if (value && clientRef.current) {
+        sendQuestion(clientRef.current, roomId, value.title, value.content);
       }
     },
-    [roomId, userId]
+    [roomId]
   );
 
   const updateQuestionLikes = useCallback(
@@ -90,7 +131,9 @@ const useChattingRoom = (roomId, userId) => {
 
   const handleSendLike = useCallback(
     (questionId) => {
-      sendLike(questionId, userId);
+      if (clientRef.current) {
+        sendLike(clientRef.current, questionId, userId);
+      }
     },
     [userId]
   );
@@ -102,6 +145,7 @@ const useChattingRoom = (roomId, userId) => {
   const handleIncomingMessage = useCallback(
     (message) => {
       const data = JSON.parse(message.body);
+      console.log(data);
       switch (data.type) {
         case "question":
           setQuestions((prev) => [
@@ -136,60 +180,65 @@ const useChattingRoom = (roomId, userId) => {
       resetQuestionTimer,
     ]
   );
-  const BACKEND_SERVER = process.env.REACT_APP_BACKEND_SERVER_URL;
 
-  useEffect(() => {
-    const client =
-      process.env.REACT_APP_USE_MOCK === "true"
-        ? new MockStompClient({
-            brokerURL: "ws://localhost:8080/ws-connection",
-            onConnect: () => {
-              console.log("Connected to Mock WebSocket");
-              client.subscribe(
-                `/subscribe/rooms/${roomId}`,
-                handleIncomingMessage
-              );
-              sendJoinRoom(client, roomId, userId);
-            },
-          })
-        : new Client({
-            brokerURL: `ws://${BACKEND_SERVER}/ws-connection`,
-            onConnect: () => {
-              console.log("Connected to WebSocket");
-              client.subscribe(
-                `/subscribe/rooms/${roomId}`,
-                handleIncomingMessage
-              );
-              sendJoinRoom(client, roomId, userId);
-            },
-          });
+  const authToken =
+    "Bearer eyJKV1QiOiJKV1QiLCJhbGciOiJIUzUxMiJ9.eyJ1dWlkIjoxLCJyb2xlIjoiVVNFUiIsImlhdCI6MTcyNzI0NDIyMSwiZXhwIjoxNzI3ODQ5MDIxfQ.s1zTIqEF8BW04XU2ffkxIzm9-3UI8R7JUWYkx8HRYGHBKQHSAm3lVmwIIRcowzJbJEAF1j36ryl_GuRwsDqEvA";
+
+  const connectToWebSocket = useCallback(() => {
+    const BACKEND_SERVER = process.env.REACT_APP_BACKEND_SERVER_URL;
+    const client = new Client({
+      brokerURL: `wss://${BACKEND_SERVER}/ws-connection?token=${authToken}`,
+      connectHeaders: {
+        Authorization: authToken,
+      },
+
+      onConnect: () => {
+        client.subscribe(`/subscribe/rooms/1`, handleIncomingMessage);
+        sendJoinRoom(client, 1);
+        sendQuestion(client, 1, "제목1234", "내용");
+      },
+      onStompError: (frame) => {
+        console.error("Broker reported error: " + frame.headers["message"]);
+        console.error("Additional details: " + frame.body);
+      },
+      onWebSocketError: (error) => {
+        console.error("WebSocket error:", error);
+      },
+      onDisconnect: () => {
+        console.log("Disconnected from WebSocket");
+      },
+    });
 
     client.activate();
-    setStompClient(client);
+    clientRef.current = client;
+  }, [handleIncomingMessage]);
 
-    // Set up interval to periodically update question timers
-    const timerIntervalId = setInterval(updateQuestionTimers, 1000);
+  const disconnectFromWebSocket = useCallback(() => {
+    if (clientRef.current && clientRef.current.active) {
+      sendLeaveRoom(clientRef.current, roomId, userId);
+      clientRef.current.deactivate();
+    }
+    setStompClient(null);
+  }, [roomId, userId, setStompClient]);
 
-    // Capture the current value of timerRef.current
-    const timers = timerRef.current;
+  useEffect(() => {
+    if (isUseEffectOn) {
+      connectToWebSocket();
+      const timerIntervalId = setInterval(updateQuestionTimers, 1000);
 
-    return () => {
-      if (client) {
-        sendLeaveRoom(client, roomId, userId);
-        client.deactivate();
-      }
-      clearInterval(timerIntervalId);
-      // Clear all timers using the captured value
-      Object.values(timers).forEach(clearTimeout);
-    };
+      return () => {
+        disconnectFromWebSocket();
+        clearInterval(timerIntervalId);
+        const currentTimers = timerRef.current;
+        Object.values(currentTimers).forEach(clearTimeout);
+      };
+    }
   }, [
     roomId,
-    userId,
-    setStompClient,
-    handleIncomingMessage,
-    removeExpiredQuestions,
+    isUseEffectOn,
+    connectToWebSocket,
+    disconnectFromWebSocket,
     updateQuestionTimers,
-    BACKEND_SERVER,
   ]);
 
   return {
