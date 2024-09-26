@@ -1,25 +1,89 @@
 import React, { useState } from "react";
 import styles from "./roomListPage.module.css"; // 스타일 적용을 위한 CSS 모듈
+import copyIcon from "./copy.png";
 
 const RoomListPage = () => {
   const [rooms] = useState([
     {
-      roomName: "React 기본 스터디",
-      lectureName: "React 입문",
-      lectureDate: "2024-09-25",
-      lecturePlace: "온라인",
+      roomName: "구름",
+      lectureName: "구름해커톤세미나",
+      lectureDate: "2024.09.23",
+      lecturePlace: "2강의실",
       url: "https://example.com/react-study",
       review: "유익한 강의였어요!",
     },
     {
-      roomName: "JavaScript 심화",
-      lectureName: "JS 고급 문법",
-      lectureDate: "2024-10-01",
-      lecturePlace: "서울",
-      url: "https://example.com/js-advanced",
-      review: "좋은 실습 기회였습니다.",
+      roomName: "구름",
+      lectureName: "구름해커톤세미나",
+      lectureDate: "2024.09.23",
+      lecturePlace: "2강의실",
+      url: "https://example.com/react-study",
+      review: "유익한 강의였어요!",
     },
-    // 필요한 만큼 방 추가
+    {
+      roomName: "구름",
+      lectureName: "구름해커톤세미나",
+      lectureDate: "2024.09.23",
+      lecturePlace: "2강의실",
+      url: "https://example.com/react-study",
+      review: "유익한 강의였어요!",
+    },
+    {
+      roomName: "구름",
+      lectureName: "구름해커톤세미나",
+      lectureDate: "2024.09.23",
+      lecturePlace: "2강의실",
+      url: "https://example.com/react-study",
+      review: "유익한 강의였어요!",
+    },
+    {
+      roomName: "구름",
+      lectureName: "구름해커톤세미나",
+      lectureDate: "2024.09.23",
+      lecturePlace: "2강의실",
+      url: "https://example.com/react-study",
+      review: "유익한 강의였어요!",
+    },
+    {
+      roomName: "구름",
+      lectureName: "구름해커톤세미나",
+      lectureDate: "2024.09.23",
+      lecturePlace: "2강의실",
+      url: "https://example.com/react-study",
+      review: "유익한 강의였어요!",
+    },
+    {
+      roomName: "구름",
+      lectureName: "구름해커톤세미나",
+      lectureDate: "2024.09.23",
+      lecturePlace: "2강의실",
+      url: "https://example.com/react-study",
+      review: "유익한 강의였어요!",
+    },
+    {
+      roomName: "구름",
+      lectureName: "구름해커톤세미나",
+      lectureDate: "2024.09.23",
+      lecturePlace: "2강의실",
+      url: "https://example.com/react-study",
+      review: "유익한 강의였어요!",
+    },
+    {
+      roomName: "구름",
+      lectureName: "구름해커톤세미나",
+      lectureDate: "2024.09.23",
+      lecturePlace: "2강의실",
+      url: "https://example.com/react-study",
+      review: "유익한 강의였어요!",
+    },
+    {
+      roomName: "구름",
+      lectureName: "구름해커톤세미나",
+      lectureDate: "2024.09.23",
+      lecturePlace: "2강의실",
+      url: "https://example.com/react-study",
+      review: "유익한 강의였어요!",
+    },
   ]);
 
   const copyUrlToClipboard = (url) => {
@@ -51,11 +115,17 @@ const RoomListPage = () => {
               <td>{room.lectureDate}</td>
               <td>{room.lecturePlace}</td>
               <td>
+                {/* URL 표시 추가 */}
+                <span className={styles.urlText}>{room.url}</span>
                 <button
                   className={styles.copyButton}
                   onClick={() => copyUrlToClipboard(room.url)}
                 >
-                  복사
+                  <img
+                    src={copyIcon} // import한 로컬 이미지 경로 사용
+                    alt="복사"
+                    className={styles.copyIcon}
+                  />
                 </button>
               </td>
               <td>{room.review}</td>

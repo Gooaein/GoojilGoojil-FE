@@ -6,7 +6,7 @@ import { Header } from "./components/common/Header/Header";
 import ChattingRoomPage from "./pages/chat/chattingRoomPage";
 import CreateRoomPage from "./pages/createRoom/createRoomPage";
 import RoomListPage from "./pages/list/roomListPage";
-import SpeakerRoomPage from "./pages/spaekerRoom/speakerRoomPage";
+import SpeakerRoomPage from "./pages/speakerRoom/speakerRoomPage";
 
 const AppRouter = () => (
   <Router>

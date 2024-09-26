@@ -19,9 +19,10 @@ const CreateRoom = () => {
         <input
           type="text"
           id="roomName"
-          placeholder="url을 입력해주세요"
+          placeholder="url을 입력해주세요..."
           className={styles.inputBox}
         />
+        <div className={styles.requiredText}>*필수 질문입니다</div>
       </div>
 
       {/* 강의 이름 */}
@@ -30,7 +31,7 @@ const CreateRoom = () => {
         <input
           type="text"
           id="lectureName"
-          placeholder="진행할 강의명을 입력해주세요"
+          placeholder="진행할 강의명을 입력해주세요..."
           className={styles.inputBox}
         />
       </div>
@@ -47,7 +48,7 @@ const CreateRoom = () => {
         <input
           type="text"
           id="lecturePlace"
-          placeholder="강의가 진행되는 장소명을 입력해주세요"
+          placeholder="강의가 진행되는 장소명을 입력해주세요..."
           className={styles.inputBox}
         />
       </div>
