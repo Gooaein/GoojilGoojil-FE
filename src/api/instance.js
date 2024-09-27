@@ -1,4 +1,5 @@
 import axios from "axios";
+import { config } from "../config/config";
 // import { applyInterceptors } from "./interceptor";
 
 //.env로 숨긴 url 주소 (backend 주소 <-> front 주소)
@@ -16,7 +17,7 @@ exampleInstance.defaults.baseURL += "/example";
 // '/api/v1/rooms' 경로를 위한 인스턴스
 const roomsInstance = axios.create({
   baseURL: `${BASE_URL}/api/v1/rooms`,
-  withCredentials: true,
+  withCredentials: config.withCredentials,
 });
 
 // '/api/v1/rooms' 경로를 위한 인스턴스

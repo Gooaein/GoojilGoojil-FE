@@ -2,11 +2,10 @@
 import React, { useState } from "react";
 import styles from "./createRoomPage.module.css"; // 스타일을 위한 CSS 모듈
 import { BUTTON_LABELS } from "../../constants/introContent"; // 버튼 라벨 import
-import { useNavigate } from "react-router-dom";
+
 import RoomComponent from "../../components/room/roomComponent"; // RoomComponent 모달 import
 
 const CreateRoom = () => {
-  const navigate = useNavigate();
   const [modalOpen, setModalOpen] = useState(false); // 모달 상태 관리
   const [roomUrl, setRoomUrl] = useState(""); // 방 URL 상태 관리
 

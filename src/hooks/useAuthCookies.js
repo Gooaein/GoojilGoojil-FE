@@ -10,7 +10,7 @@ const useAuthCookies = () => {
     const fetchedRefreshToken = Cookies.get("refresh_token");
 
     if (fetchedAccessToken) {
-      setAccessToken(fetchedAccessToken);
+      setAccessToken(`Bearer ${fetchedAccessToken}`);
     } else {
       console.log("설정된 쿠키가 없습니다.");
     }

@@ -18,3 +18,83 @@
   margin: 0; /* 기본 마진 제거 */
   text-align: center; /* 텍스트 중앙 정렬 */
 }
+
+.questionCloudContainer {
+  position: relative;
+}
+
+.contentPopover {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  background-color: white;
+  border: 1px solid #ddd;
+  padding: 10px;
+  border-radius: 5px;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+  z-index: 1000;
+}
+
+.likeButton {
+  background-color: #f0f0f0;
+  border: none;
+  padding: 5px 10px;
+  border-radius: 5px;
+  cursor: pointer;
+  margin-top: 10px;
+}
+
+.likeButton:hover {
+  background-color: #e0e0e0;
+}
+
+.modalOverlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.7);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+.modalContent {
+  background-color: white;
+  padding: 20px;
+  border-radius: 10px;
+  width: 80%;
+  max-width: 500px;
+  max-height: 80vh;
+  overflow-y: auto;
+}
+
+.modalTitle {
+  font-size: 24px;
+  margin-bottom: 15px;
+  text-align: center;
+}
+
+.modalBody {
+  font-size: 16px;
+  line-height: 1.5;
+  margin-bottom: 20px;
+}
+
+.likeButton {
+  display: block;
+  margin: 0 auto;
+  padding: 10px 20px;
+  background-color: #4caf50;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 16px;
+}
+
+.likeButton:hover {
+  background-color: #45a049;
+}

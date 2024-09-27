@@ -2,7 +2,7 @@ const CLOUD_WIDTH = 200; // Adjust based on your QuestionCloud's width
 const CLOUD_HEIGHT = 100; // Adjust based on your QuestionCloud's height
 const PADDING = 20; // Padding between clouds
 
-export const getRandomPosition = (
+export const getRandomCloudPosition = (
   containerWidth,
   containerHeight,
   existingPositions

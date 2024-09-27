@@ -1,11 +1,12 @@
-import React, { useMemo } from "react";
+import React, { useState, useMemo, useCallback } from "react";
 import styles from "./QuestionCloud.module.css";
 import { QUESTION_LIFETIME } from "../../../constants/questionLifeTime";
 import chatCloudImage from "../../../assets/images/chat/chatCloudImage.png";
+import Portal from "../../common/Portal";
 
 const getOpacity = (remainingTime) => {
   if (typeof remainingTime !== "number" || isNaN(remainingTime)) {
-    return 0.3; // 기본 최소 opacity 값 반환
+    return 0.3;
   }
   const maxOpacity = 1;
   const minOpacity = 0.3;
@@ -15,7 +16,9 @@ const getOpacity = (remainingTime) => {
   return Math.max(minOpacity, Math.min(maxOpacity, opacity));
 };
 
-export const QuestionCloud = React.memo(({ question }) => {
+export const QuestionCloud = React.memo(({ question, handleSendLike }) => {
+  const [isModalOpen, setIsModalOpen] = useState(false);
+
   const cloudStyle = useMemo(
     () => ({
       opacity: getOpacity(question.remainingTime),
@@ -27,10 +30,48 @@ export const QuestionCloud = React.memo(({ question }) => {
     [question.remainingTime]
   );
 
+  const toggleModal = useCallback(() => {
+    setIsModalOpen(!isModalOpen);
+  }, [isModalOpen]);
+
+  const onLikeClick = useCallback(
+    (e) => {
+      e.stopPropagation();
+      if (typeof handleSendLike === "function") {
+        handleSendLike(question.questionId);
+      } else {
+        console.error("handleSendLike is not a function");
+      }
+    },
+    [handleSendLike, question.questionId]
+  );
+
   return (
-    <div className={styles.questionCloud} style={cloudStyle}>
-      <p>{question.title}</p>
-    </div>
+    <>
+      <div
+        className={styles.questionCloud}
+        style={cloudStyle}
+        onClick={toggleModal}
+      >
+        <p>{question.title}</p>
+      </div>
+      {isModalOpen && (
+        <Portal>
+          <div className={styles.modalOverlay} onClick={toggleModal}>
+            <div
+              className={styles.modalContent}
+              onClick={(e) => e.stopPropagation()}
+            >
+              <h2 className={styles.modalTitle}>{question.title}</h2>
+              <p className={styles.modalBody}>{question.content}</p>
+              <button onClick={onLikeClick} className={styles.likeButton}>
+                👍 공감 ({question.like_count || 0})
+              </button>
+            </div>
+          </div>
+        </Portal>
+      )}
+    </>
   );
 });
 
