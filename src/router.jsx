@@ -11,9 +11,8 @@ const AppRouter = () => (
     <Header />
     <Routes>
       <Route path="/" element={<IntroPage />} />
-      <Route path="/chattingRoom" element={<ChattingRoomPage />} />
-      <Route path="/customize" element={<CustomizingPage />} />
-
+      <Route path="/:uuid/chattingRoom" element={<ChattingRoomPage />} />
+      <Route path="/:uuid/customize" element={<CustomizingPage />} />
       <Route path="*" element={<NotFoundPage />} />
     </Routes>
   </Router>
