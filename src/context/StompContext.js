@@ -8,6 +8,7 @@ import React, {
 } from "react";
 import { Client } from "@stomp/stompjs";
 import useAuthCookies from "../hooks/useAuthCookies";
+import { config } from "../config/config";
 
 const StompContext = createContext();
 
@@ -18,15 +19,13 @@ export const StompProvider = ({ children }) => {
 
   const connectToWebSocket = useCallback(() => {
     const BACKEND_SERVER = process.env.REACT_APP_BACKEND_SERVER_STOMP_URL;
-    const authToken = accessToken;
+    const authToken = config.isTestMode ? config.authToken : accessToken;
     const client = new Client({
       brokerURL: `wss://${BACKEND_SERVER}/ws-connection?token=${authToken}`,
       connectHeaders: {
         Authorization: authToken,
       },
-      debug: (str) => {
-        console.log("STOMP Debug:", str);
-      },
+
       onConnect: () => {
         console.log("WebSocket connection established!");
         setIsConnected(true);
