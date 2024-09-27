@@ -34,6 +34,7 @@ jobs:
 
       - name: 환경 변수 설정
         run: |
+          echo "REACT_APP_BACKEND_SERVER_STOMP_URL=${{ secrets.REACT_APP_BACKEND_SERVER_STOMP_URL }}" >> .env
           echo "REACT_APP_BACKEND_SERVER_URL=${{ secrets.REACT_APP_BACKEND_SERVER_URL }}" >> .env
           echo "REACT_APP_REGION=${{ secrets.REACT_APP_REGION }}" >> .env
           echo "REACT_APP_ACCESS_KEY_ID=${{ secrets.REACT_APP_ACCESS_KEY_ID }}" >> .env
