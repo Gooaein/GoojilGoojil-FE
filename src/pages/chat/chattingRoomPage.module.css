@@ -3,6 +3,7 @@
   height: 88vh;
   background: linear-gradient(to bottom, #577ef5, #ffcaca);
   position: relative;
+  overflow: hidden;
 }
 
 .cloudContainer {
@@ -11,4 +12,27 @@
   left: 0;
   right: 0;
   bottom: 60px; /* Adjust based on your ChattingInput height */
+}
+
+.cloudAnimation {
+  animation: fadeIn 0.5s ease-out;
+  transition: all 0.3s ease;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: scale(0.9);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+/* 반응형 디자인을 위한 미디어 쿼리 */
+@media (max-width: 768px) {
+  .cloudContainer {
+    bottom: 80px; /* 모바일에서는 입력창이 더 커질 수 있으므로 조정 */
+  }
 }
