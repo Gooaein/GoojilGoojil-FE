@@ -1,79 +1,14 @@
 import { useCallback, useEffect, useRef } from "react";
 import { useRecoilState, useSetRecoilState } from "recoil";
-import { Client } from "@stomp/stompjs";
-import {
-  activeUsersState,
-  questionsState,
-  stompClientState,
-} from "../../recoil/chat-atoms";
+import { activeUsersState, questionsState } from "../../recoil/chat-atoms";
 import { QUESTION_LIFETIME } from "../../constants/questionLifeTime";
+import { useStompClient } from "../../context/StompContext";
 
 const useChattingRoom = (roomId, userId, isUseEffectOn) => {
   const [questions, setQuestions] = useRecoilState(questionsState);
   const setActiveUsers = useSetRecoilState(activeUsersState);
-  const [, setStompClient] = useRecoilState(stompClientState);
+  const { isConnected, stompClientRef } = useStompClient();
   const timerRef = useRef({});
-  const clientRef = useRef(null);
-
-  const sendQuestion = (stompClient, roomId, title, content) => {
-    if (stompClient && stompClient.connected) {
-      stompClient.publish({
-        destination: `/app/rooms/${roomId}/questions`,
-        body: JSON.stringify({
-          title: title,
-          content: content,
-        }),
-        headers: { "content-type": "application/json" },
-      });
-    } else {
-      console.error("[sendQuestion] : STOMP client is not connected");
-    }
-  };
-
-  const sendLike = (stompClient, questionId, userId) => {
-    if (stompClient && stompClient.connected) {
-      stompClient.publish({
-        destination: `/app/likes/${questionId}`,
-        body: JSON.stringify({
-          type: "like",
-          question_id: questionId,
-          sendTime: new Date().toISOString(),
-          userId: userId,
-        }),
-      });
-    } else {
-      console.error("[sendLike] : STOMP client is not connected");
-    }
-  };
-
-  const sendJoinRoom = (stompClient, roomId) => {
-    if (stompClient && stompClient.connected) {
-      stompClient.publish({
-        destination: `/app/rooms/${roomId}/in`,
-        body: JSON.stringify({
-          type: "in",
-          sendTime: new Date().toISOString(),
-        }),
-      });
-    } else {
-      console.error("STOMP client is not connected");
-    }
-  };
-
-  const sendLeaveRoom = (stompClient, roomId, userId) => {
-    if (stompClient && stompClient.connected) {
-      stompClient.publish({
-        destination: `/app/rooms/${roomId}/out`,
-        body: JSON.stringify({
-          type: "out",
-          guest_id: userId,
-          sendTime: new Date().toISOString(),
-        }),
-      });
-    } else {
-      console.error("[sendLeaveRoom] : STOMP client is not connected");
-    }
-  };
 
   const removeExpiredQuestions = useCallback(() => {
     const now = Date.now();
@@ -106,14 +41,6 @@ const useChattingRoom = (roomId, userId, isUseEffectOn) => {
     },
     [removeExpiredQuestions]
   );
-  const handleSendQuestion = useCallback(
-    (value) => {
-      if (value && clientRef.current) {
-        sendQuestion(clientRef.current, roomId, value.title, value.content);
-      }
-    },
-    [roomId]
-  );
 
   const updateQuestionLikes = useCallback(
     (likeData) => {
@@ -129,30 +56,45 @@ const useChattingRoom = (roomId, userId, isUseEffectOn) => {
     [setQuestions, resetQuestionTimer]
   );
 
-  const handleSendLike = useCallback(
-    (questionId) => {
-      if (clientRef.current) {
-        sendLike(clientRef.current, questionId, userId);
-      }
-    },
-    [userId]
-  );
-
   const handleRoomEnd = useCallback((data) => {
     window.location.href = data.url;
   }, []);
 
+  const parseStompMessage = useCallback((message) => {
+    if (message.binaryBody) {
+      const bodyString = new TextDecoder().decode(message.binaryBody);
+      try {
+        return JSON.parse(bodyString);
+      } catch (error) {
+        console.error("Failed to parse binary data as JSON:", error);
+        return bodyString;
+      }
+    } else if (message.body) {
+      try {
+        return JSON.parse(message.body);
+      } catch (error) {
+        console.error("Failed to parse message body as JSON:", error);
+        return message.body;
+      }
+    } else {
+      console.warn("No recognizable message body");
+      return null;
+    }
+  }, []);
+
   const handleIncomingMessage = useCallback(
     (message) => {
-      const data = JSON.parse(message.body);
-      console.log(data);
+      const data = parseStompMessage(message);
+      if (!data) return;
+
+      console.log("Parsed incoming data:", data);
       switch (data.type) {
         case "question":
           setQuestions((prev) => [
             ...prev,
             { ...data, expiresAt: Date.now() + QUESTION_LIFETIME },
           ]);
-          resetQuestionTimer(data.question_id);
+          resetQuestionTimer(data.questionId);
           break;
         case "like":
           updateQuestionLikes(data);
@@ -162,82 +104,104 @@ const useChattingRoom = (roomId, userId, isUseEffectOn) => {
           break;
         case "out":
           setActiveUsers((prev) =>
-            prev.filter((user) => user.guest_id !== data.guest_id)
+            prev.filter((user) => user.guestId !== data.guestId)
           );
           break;
         case "end":
           handleRoomEnd(data);
           break;
         default:
-          break;
+          console.warn("Unknown message type:", data.type);
       }
     },
     [
+      parseStompMessage,
       setQuestions,
-      updateQuestionLikes,
       setActiveUsers,
-      handleRoomEnd,
+      updateQuestionLikes,
       resetQuestionTimer,
+      handleRoomEnd,
     ]
   );
 
-  const authToken =
-    "Bearer eyJKV1QiOiJKV1QiLCJhbGciOiJIUzUxMiJ9.eyJ1dWlkIjoxLCJyb2xlIjoiVVNFUiIsImlhdCI6MTcyNzI0NDIyMSwiZXhwIjoxNzI3ODQ5MDIxfQ.s1zTIqEF8BW04XU2ffkxIzm9-3UI8R7JUWYkx8HRYGHBKQHSAm3lVmwIIRcowzJbJEAF1j36ryl_GuRwsDqEvA";
+  const sendMessage = useCallback(
+    (destination, body) => {
+      if (stompClientRef.current && stompClientRef.current.connected) {
+        stompClientRef.current.publish({
+          destination,
+          body: JSON.stringify(body),
+          headers: { "content-type": "application/json" },
+        });
+      } else {
+        console.error("STOMP client is not connected");
+      }
+    },
+    [stompClientRef]
+  );
 
-  const connectToWebSocket = useCallback(() => {
-    const BACKEND_SERVER = process.env.REACT_APP_BACKEND_SERVER_URL;
-    const client = new Client({
-      brokerURL: `wss://${BACKEND_SERVER}/ws-connection?token=${authToken}`,
-      connectHeaders: {
-        Authorization: authToken,
-      },
+  const handleSendQuestion = useCallback(
+    (value) => {
+      console.log("Sending question:", value.title, value.content);
+      sendMessage(`/app/rooms/${roomId}/questions`, {
+        title: value.title,
+        content: value.content,
+      });
+    },
+    [roomId, sendMessage]
+  );
 
-      onConnect: () => {
-        client.subscribe(`/subscribe/rooms/1`, handleIncomingMessage);
-        sendJoinRoom(client, 1);
-        sendQuestion(client, 1, "제목1234", "내용");
-      },
-      onStompError: (frame) => {
-        console.error("Broker reported error: " + frame.headers["message"]);
-        console.error("Additional details: " + frame.body);
-      },
-      onWebSocketError: (error) => {
-        console.error("WebSocket error:", error);
-      },
-      onDisconnect: () => {
-        console.log("Disconnected from WebSocket");
-      },
-    });
-
-    client.activate();
-    clientRef.current = client;
-  }, [handleIncomingMessage]);
-
-  const disconnectFromWebSocket = useCallback(() => {
-    if (clientRef.current && clientRef.current.active) {
-      sendLeaveRoom(clientRef.current, roomId, userId);
-      clientRef.current.deactivate();
-    }
-    setStompClient(null);
-  }, [roomId, userId, setStompClient]);
+  const handleSendLike = useCallback(
+    (questionId) => {
+      sendMessage(`/app/likes/${questionId}`, {
+        type: "like",
+        question_id: questionId,
+        sendTime: new Date().toISOString(),
+        userId: userId,
+      });
+    },
+    [userId, sendMessage]
+  );
 
   useEffect(() => {
-    if (isUseEffectOn) {
-      connectToWebSocket();
+    if (isUseEffectOn && isConnected && stompClientRef.current) {
+      const currentStompClient = stompClientRef.current;
+      const subscription = currentStompClient.subscribe(
+        `/subscribe/rooms/${roomId}`,
+        handleIncomingMessage
+      );
+
+      sendMessage(`/app/rooms/${roomId}/in`, {
+        type: "in",
+        sendTime: new Date().toISOString(),
+      });
+
       const timerIntervalId = setInterval(updateQuestionTimers, 1000);
 
+      // timerRef의 현재 값을 복사
+      const currentTimerRef = { ...timerRef.current };
+
       return () => {
-        disconnectFromWebSocket();
+        if (subscription) {
+          subscription.unsubscribe();
+        }
+        sendMessage(`/app/rooms/${roomId}/out`, {
+          type: "out",
+          guest_id: userId,
+          sendTime: new Date().toISOString(),
+        });
         clearInterval(timerIntervalId);
-        const currentTimers = timerRef.current;
-        Object.values(currentTimers).forEach(clearTimeout);
+        // 복사한 timerRef 값을 사용
+        Object.values(currentTimerRef).forEach(clearTimeout);
       };
     }
   }, [
-    roomId,
     isUseEffectOn,
-    connectToWebSocket,
-    disconnectFromWebSocket,
+    isConnected,
+    stompClientRef,
+    roomId,
+    userId,
+    sendMessage,
+    handleIncomingMessage,
     updateQuestionTimers,
   ]);
 
@@ -245,6 +209,7 @@ const useChattingRoom = (roomId, userId, isUseEffectOn) => {
     questions,
     handleSendQuestion,
     handleSendLike,
+    isConnected,
   };
 };
 
