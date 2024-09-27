@@ -4,12 +4,15 @@ import { QuestionCloud } from "../../components/chat/cloud/QuestionCloud";
 import { ChattingInput } from "../../components/chat/input/ChattingInput";
 import { getRandomPosition } from "../../util/getRandomCloudPosition";
 import useChattingRoom from "../../stomp/chat/useChattingRoom";
+import { useRecoilValue } from "recoil";
+import { questionsState } from "../../recoil/chat-atoms";
 
 const ChattingRoomPage = () => {
   const roomId = "1"; // 임시로 고정된 roomId 사용
   const userId = "user123"; // 임시로 고정된 userId 사용
 
-  const { questions, handleSendLike } = useChattingRoom(roomId, userId, true);
+  const { handleSendLike } = useChattingRoom(roomId, userId, true);
+  const questions = useRecoilValue(questionsState);
   const sortedQuestions = useMemo(() => {
     return [...questions];
   }, [questions]);
