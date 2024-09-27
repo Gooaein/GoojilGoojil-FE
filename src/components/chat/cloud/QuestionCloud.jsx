@@ -1,7 +1,6 @@
 import React, { useMemo } from "react";
 import styles from "./QuestionCloud.module.css";
 import { QUESTION_LIFETIME } from "../../../constants/questionLifeTime";
-import useChattingRoom from "../../../stomp/chat/useChattingRoom";
 import chatCloudImage from "../../../assets/images/chat/chatCloudImage.png";
 
 const getOpacity = (remainingTime) => {
@@ -17,8 +16,6 @@ const getOpacity = (remainingTime) => {
 };
 
 export const QuestionCloud = React.memo(({ question }) => {
-  const { handleSendLike } = useChattingRoom();
-
   const cloudStyle = useMemo(
     () => ({
       opacity: getOpacity(question.remainingTime),

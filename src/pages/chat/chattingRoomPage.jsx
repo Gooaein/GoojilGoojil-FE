@@ -1,8 +1,7 @@
-import React, { useState, useEffect, useRef, useMemo } from "react";
+import React, { useRef, useMemo } from "react";
 import styles from "./chattingRoomPage.module.css";
 import { QuestionCloud } from "../../components/chat/cloud/QuestionCloud";
 import { ChattingInput } from "../../components/chat/input/ChattingInput";
-import { getRandomPosition } from "../../util/getRandomCloudPosition";
 import useChattingRoom from "../../stomp/chat/useChattingRoom";
 import { useRecoilValue } from "recoil";
 import { questionsState } from "../../recoil/chat-atoms";
@@ -16,7 +15,7 @@ const ChattingRoomPage = () => {
   const sortedQuestions = useMemo(() => {
     return [...questions];
   }, [questions]);
-  const [cloudPositions, setCloudPositions] = useState({});
+  // const [cloudPositions, setCloudPositions] = useState({});
   const containerRef = useRef(null);
 
   //각기 다른 사용자의 화면 크기를 고려해서 띄워줘야 하니까 다음과 같이 짬
@@ -60,8 +59,8 @@ const ChattingRoomPage = () => {
             onLike={handleSendLike}
             style={{
               position: "absolute",
-              left: `${cloudPositions[question.question_id]?.x}px`,
-              top: `${cloudPositions[question.question_id]?.y}px`,
+              // left: `${cloudPositions[question.question_id]?.x}px`,
+              // top: `${cloudPositions[question.question_id]?.y}px`,
             }}
           />
         ))}
