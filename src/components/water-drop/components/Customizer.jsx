@@ -5,7 +5,7 @@ import { useRecoilState } from "recoil";
 import { characterState } from "../../../recoil/character-atoms";
 import { createCompositeImage } from "../../../util/createCompositeImage";
 import { sendAvartar } from "../../../api/room/room";
-import { Navigate, useNavigate, useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 export const Customizer = () => {
   const [character, setCharacter] = useRecoilState(characterState);
   const navigate = useNavigate();
