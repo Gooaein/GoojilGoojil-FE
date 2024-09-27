@@ -7,18 +7,18 @@ import React, {
   useRef,
 } from "react";
 import { Client } from "@stomp/stompjs";
+import useAuthCookies from "../hooks/useAuthCookies";
 
 const StompContext = createContext();
 
 export const StompProvider = ({ children }) => {
   const stompClientRef = useRef(null);
   const [isConnected, setIsConnected] = useState(false);
+  const { accessToken } = useAuthCookies();
 
   const connectToWebSocket = useCallback(() => {
     const BACKEND_SERVER = process.env.REACT_APP_BACKEND_SERVER_STOMP_URL;
-    const authToken =
-      "Bearer eyJKV1QiOiJKV1QiLCJhbGciOiJIUzUxMiJ9.eyJ1dWlkIjoxLCJ0b2tlbl90eXBlIjoiYWNjZXNzIiwicm9sZSI6IlVTRVIiLCJpYXQiOjE3Mjc0MzI2MTIsImV4cCI6MTcyODAzNzQxMn0.js3B9tk6csmI2vIMIQUfTHF6PdmTOf0lCs0aZcSX3iHY6TTew-tPAYPqJNZw-AekuJa2FAS3pF-xvcuFAAU6tA";
-
+    const authToken = accessToken;
     const client = new Client({
       brokerURL: `wss://${BACKEND_SERVER}/ws-connection?token=${authToken}`,
       connectHeaders: {
@@ -47,7 +47,7 @@ export const StompProvider = ({ children }) => {
 
     client.activate();
     stompClientRef.current = client;
-  }, []);
+  }, [accessToken]);
 
   useEffect(() => {
     connectToWebSocket();

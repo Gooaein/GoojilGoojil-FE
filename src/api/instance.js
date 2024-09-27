@@ -16,8 +16,14 @@ exampleInstance.defaults.baseURL += "/example";
 // '/api/v1/rooms' 경로를 위한 인스턴스
 const roomsInstance = axios.create({
   baseURL: `${BASE_URL}/api/v1/rooms`,
+  withCredentials: true,
 });
 
+// '/api/v1/rooms' 경로를 위한 인스턴스
+const oauth2 = axios.create({
+  baseURL: `${BASE_URL}/oauth2/authorization/kakao
+  `,
+});
 // applyInterceptors(exampleInstance);
 
-export { defaultInstance, exampleInstance, roomsInstance };
+export { defaultInstance, exampleInstance, roomsInstance, oauth2 };
