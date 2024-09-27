@@ -1,14 +1,21 @@
-import React from "react";
+// CreateRoom.js
+import React, { useState } from "react";
 import styles from "./createRoomPage.module.css"; // 스타일을 위한 CSS 모듈
 import { BUTTON_LABELS } from "../../constants/introContent"; // 버튼 라벨 import
 import { useNavigate } from "react-router-dom";
+import RoomComponent from "../../components/room/roomComponent"; // RoomComponent 모달 import
 
 const CreateRoom = () => {
   const navigate = useNavigate();
+  const [modalOpen, setModalOpen] = useState(false); // 모달 상태 관리
+  const [roomUrl, setRoomUrl] = useState(""); // 방 URL 상태 관리
 
   function handleCreateButton() {
     // 방 생성 로직 추가
     console.log("방 생성 버튼 클릭됨.");
+    const generatedUrl = "https://example.com/react-study"; // 생성된 URL
+    setRoomUrl(generatedUrl); // URL 상태 업데이트
+    setModalOpen(true); // 모달 열기
   }
 
   return (
@@ -59,6 +66,15 @@ const CreateRoom = () => {
           {BUTTON_LABELS.CREATE_ROOM}
         </button>
       </div>
+
+      {/* RoomComponent 모달 */}
+      {modalOpen && (
+        <RoomComponent
+          isOpen={modalOpen} // 모달 열림 상태
+          onClose={() => setModalOpen(false)} // 모달 닫기 함수 전달
+          url={roomUrl} // 생성된 URL 전달
+        />
+      )}
     </div>
   );
 };
