@@ -5,5 +5,10 @@
   scroll-behavior: smooth;
 }
 .customizingPageContainer h2 {
+  display: flex;
+  flex-direction: column;
+  align-self: center;
+  align-items: center;
+  justify-self: center;
   color: black;
 }

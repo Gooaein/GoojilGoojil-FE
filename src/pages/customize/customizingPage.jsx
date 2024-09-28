@@ -13,7 +13,7 @@ const CustomizingPage = () => {
 
   return (
     <div className={styles.customizingPageContainer}>
-      <h2>나만의 호기심 물바우로 참여해요!</h2>
+      <h2>나만의 호기심 물바울로 참여해요!</h2>
       <WaterDropCharacterCustomizing />
     </div>
   );
