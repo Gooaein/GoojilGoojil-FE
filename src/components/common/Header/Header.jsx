@@ -17,6 +17,26 @@ export const Header = () => {
     setShowActiveUsers(!showActiveUsers);
   };
 
+  const handleExternalLink = (url) => {
+    window.open(url, "_blank", "noopener,noreferrer");
+  };
+
+  const navItems = [
+    { name: "홈", icon: Home, path: "/" },
+    {
+      name: "소개",
+      icon: Info,
+      path: "https://litt.ly/googilgoojil",
+      external: true,
+    },
+    {
+      name: "리틀리",
+      icon: Mail,
+      path: "https://litt.ly/googilgoojil",
+      external: true,
+    },
+  ];
+
   return (
     <>
       <header className={styles.header}>
@@ -28,16 +48,22 @@ export const Header = () => {
           </div>
           <nav>
             <ul className={styles.navList}>
-              {[
-                { name: "홈", icon: Home },
-                { name: "소개", icon: Info },
-                { name: "연락처", icon: Mail },
-              ].map((item) => (
+              {navItems.map((item) => (
                 <li key={item.name}>
-                  <Link className={styles.navItem}>
-                    <item.icon className={styles.icon} size={18} />
-                    {item.name}
-                  </Link>
+                  {item.external ? (
+                    <button
+                      onClick={() => handleExternalLink(item.path)}
+                      className={styles.navItem}
+                    >
+                      <item.icon className={styles.icon} size={18} />
+                      {item.name}
+                    </button>
+                  ) : (
+                    <Link to={item.path} className={styles.navItem}>
+                      <item.icon className={styles.icon} size={18} />
+                      {item.name}
+                    </Link>
+                  )}
                 </li>
               ))}
               <li>
