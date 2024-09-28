@@ -2,11 +2,7 @@
 import { useSetRecoilState } from "recoil";
 
 import * as roomAPI from "./room";
-import {
-  reviewState,
-  roomDataState,
-  roomIdState,
-} from "../../recoil/room-atoms";
+import { reviewState, roomDataState } from "../../recoil/room-atoms";
 import useAuthCookies from "../../hooks/useAuthCookies";
 import { useNavigate } from "react-router-dom";
 import { activeUsersState, questionsState } from "../../recoil/chat-atoms";
@@ -17,7 +13,6 @@ export const useRoom = () => {
   const setReview = useSetRecoilState(reviewState);
   const setActiveUsers = useSetRecoilState(activeUsersState);
   const setQuestions = useSetRecoilState(questionsState);
-  const setRoomId = useSetRecoilState(roomIdState);
   const { accessToken } = useAuthCookies();
   const navigate = useNavigate();
 
@@ -95,7 +90,8 @@ export const useRoom = () => {
   const postAvatar = async (avatar_base64, uuid) => {
     try {
       const data = await sendAvatar(avatar_base64, uuid);
-      await setRoomId(data.roomId);
+      console.log("avatar", data);
+      localStorage.setItem("roomId", data.roomId);
     } catch (error) {
       console.error("Failed to post Avatar:", error);
     }

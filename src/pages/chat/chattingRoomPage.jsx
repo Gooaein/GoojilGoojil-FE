@@ -12,13 +12,12 @@ import useChattingRoom from "../../stomp/chat/useChattingRoom";
 import { useRecoilValue } from "recoil";
 import { questionsState } from "../../recoil/chat-atoms";
 import useRoom from "../../api/room/useRoom";
-import { roomIdState } from "../../recoil/room-atoms";
 
 const CLOUD_WIDTH = 200;
 const CLOUD_HEIGHT = 150;
 
 const ChattingRoomPage = () => {
-  const roomId = useRecoilValue(roomIdState);
+  const roomId = localStorage.getItem("roomId");
   const { handleSendLike } = useChattingRoom(roomId, true);
   const questions = useRecoilValue(questionsState);
   const [viewportSize, setViewportSize] = useState({ width: 0, height: 0 });
