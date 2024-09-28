@@ -1,4 +1,4 @@
-import React, { useMemo, useEffect, useCallback, useRef } from "react";
+import React, { useEffect, useCallback, useRef, useState } from "react";
 import styles from "./chattingRoomPage.module.css";
 import { QuestionCloud } from "../../components/chat/cloud/QuestionCloud";
 import { ChattingInput } from "../../components/chat/input/ChattingInput";
@@ -8,16 +8,16 @@ import { questionsState } from "../../recoil/chat-atoms";
 import useRoom from "../../api/room/useRoom";
 import { useNavigate, useParams } from "react-router-dom";
 
-const CLOUD_WIDTH = 150;
-const CLOUD_HEIGHT = 100;
-const CHATTING_INPUT_HEIGHT = 100; // Assuming ChattingInput height is 100px
+const CHATTING_INPUT_HEIGHT = 100;
 const PADDING = 20;
+const GRID_SIZE = 50; // Size of each grid cell
 
 const ChattingRoomPage = () => {
   const roomId = localStorage.getItem("roomId");
   const { handleSendLike } = useChattingRoom(roomId, true);
   const questions = useRecoilValue(questionsState);
-  const cloudPositionsRef = useRef({});
+  const [cloudPositions, setCloudPositions] = useState({});
+  const gridRef = useRef({});
 
   const { getGuests, getQuestions } = useRoom();
   const dataFetchedRef = useRef(null);
@@ -41,61 +41,59 @@ const ChattingRoomPage = () => {
     fetchData();
   }, [roomId, getQuestions, getGuests, navigate, uuid]);
 
-  const getRandomPosition = useCallback((existingPositions) => {
-    const maxWidth = window.innerWidth - CLOUD_WIDTH - PADDING * 2;
-    const maxHeight =
-      window.innerHeight - CHATTING_INPUT_HEIGHT - CLOUD_HEIGHT - PADDING * 2;
-    let attempts = 0;
-    const maxAttempts = 100;
+  const initializeGrid = useCallback(() => {
+    const maxWidth = Math.floor((window.innerWidth - PADDING * 2) / GRID_SIZE);
+    const maxHeight = Math.floor(
+      (window.innerHeight - CHATTING_INPUT_HEIGHT - PADDING * 2) / GRID_SIZE
+    );
 
-    while (attempts < maxAttempts) {
-      const x = Math.random() * maxWidth + PADDING;
-      const y = Math.random() * maxHeight + PADDING;
+    gridRef.current = Array(maxHeight)
+      .fill()
+      .map(() => Array(maxWidth).fill(false));
+  }, []);
 
-      const overlap = existingPositions.some(
-        (pos) =>
-          Math.abs(pos.x - x) < CLOUD_WIDTH &&
-          Math.abs(pos.y - y) < CLOUD_HEIGHT
-      );
+  const getRandomPosition = useCallback(() => {
+    const maxWidth = gridRef.current[0].length;
+    const maxHeight = gridRef.current.length;
 
-      if (!overlap) {
-        return { x, y };
+    const availableCells = [];
+    for (let y = 0; y < maxHeight; y++) {
+      for (let x = 0; x < maxWidth; x++) {
+        if (!gridRef.current[y][x]) {
+          availableCells.push({ x, y });
+        }
       }
-
-      attempts++;
     }
 
-    // Fallback position if no non-overlapping position is found
+    if (availableCells.length === 0) return null;
+
+    const randomCell =
+      availableCells[Math.floor(Math.random() * availableCells.length)];
+    gridRef.current[randomCell.y][randomCell.x] = true;
+
     return {
-      x: Math.random() * maxWidth + PADDING,
-      y: Math.random() * maxHeight + PADDING,
+      x: randomCell.x * GRID_SIZE + PADDING,
+      y: randomCell.y * GRID_SIZE + PADDING,
     };
   }, []);
 
-  useMemo(() => {
+  const updateCloudPositions = useCallback(() => {
+    initializeGrid();
+    const newPositions = {};
     questions.forEach((question) => {
-      if (!cloudPositionsRef.current[question.questionId]) {
-        const existingPositions = Object.values(cloudPositionsRef.current);
-        const position = getRandomPosition(existingPositions);
-        cloudPositionsRef.current[question.questionId] = position;
+      const position = getRandomPosition();
+      if (position) {
+        newPositions[question.questionId] = position;
       }
     });
-  }, [questions, getRandomPosition]);
+    setCloudPositions(newPositions);
+  }, [questions, getRandomPosition, initializeGrid]);
 
   useEffect(() => {
-    const handleResize = () => {
-      // Clear existing positions and recalculate on resize
-      cloudPositionsRef.current = {};
-      questions.forEach((question) => {
-        const existingPositions = Object.values(cloudPositionsRef.current);
-        const position = getRandomPosition(existingPositions);
-        cloudPositionsRef.current[question.questionId] = position;
-      });
-    };
-
-    window.addEventListener("resize", handleResize);
-    return () => window.removeEventListener("resize", handleResize);
-  }, [questions, getRandomPosition]);
+    updateCloudPositions();
+    window.addEventListener("resize", updateCloudPositions);
+    return () => window.removeEventListener("resize", updateCloudPositions);
+  }, [updateCloudPositions]);
 
   return (
     <div className={styles.container}>
@@ -107,8 +105,8 @@ const ChattingRoomPage = () => {
             handleSendLike={handleSendLike}
             style={{
               position: "absolute",
-              left: `${cloudPositionsRef.current[question.questionId]?.x}px`,
-              top: `${cloudPositionsRef.current[question.questionId]?.y}px`,
+              left: `${cloudPositions[question.questionId]?.x}px`,
+              top: `${cloudPositions[question.questionId]?.y}px`,
             }}
           />
         ))}
