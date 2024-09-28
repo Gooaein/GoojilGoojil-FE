@@ -152,7 +152,7 @@ const useChattingRoom = (roomId, userId, isUseEffectOn) => {
 
   const handleSendLike = useCallback(
     (questionId) => {
-      sendMessage(`/app/likes/${questionId}`, {
+      sendMessage(`/app/rooms/${roomId}/questions/${questionId}/likes`, {
         type: "like",
         question_id: questionId,
         sendTime: new Date().toISOString(),
