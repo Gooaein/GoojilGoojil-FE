@@ -33,6 +33,7 @@ const SpeakerRoomPage = () => {
 
   useEffect(() => {
     setPersistentQuestions((prevQuestions) => {
+      // Update existing questions' like counts
       const updatedQuestions = prevQuestions.map((prevQ) => {
         const updatedQ = questions.find(
           (q) => q.questionId === prevQ.questionId
@@ -40,6 +41,7 @@ const SpeakerRoomPage = () => {
         return updatedQ ? { ...prevQ, likeCount: updatedQ.likeCount } : prevQ;
       });
 
+      // Add new questions
       const newQuestions = sortedQuestions
         .filter(
           (newQ) =>
