@@ -45,7 +45,6 @@ export const QuestionCloud = React.memo(
         display: "flex",
         alignItems: "center",
         justifyContent: "center",
-        position: "relative",
       };
     }, [question.remainingTime, question.likeCount, style]);
 
