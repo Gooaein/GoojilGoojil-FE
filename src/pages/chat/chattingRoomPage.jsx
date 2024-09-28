@@ -32,21 +32,18 @@ const ChattingRoomPage = () => {
     });
   }, []);
 
-  const memoizedGetQuestions = useCallback(() => {
-    getQuestions(roomId);
-  }, [getQuestions, roomId]);
-
-  const memoizedGetGuests = useCallback(() => {
-    getGuests(roomId);
-  }, [getGuests, roomId]);
+  useEffect(() => {
+    if (roomId) {
+      getQuestions(roomId);
+      getGuests(roomId);
+    }
+  }, [roomId, getQuestions, getGuests]);
 
   useEffect(() => {
-    memoizedGetQuestions();
-    memoizedGetGuests();
     updateViewportSize();
     window.addEventListener("resize", updateViewportSize);
     return () => window.removeEventListener("resize", updateViewportSize);
-  }, [memoizedGetQuestions, memoizedGetGuests, updateViewportSize]);
+  }, [updateViewportSize]);
 
   const getRandomPosition = useCallback(
     (existingPositions) => {
