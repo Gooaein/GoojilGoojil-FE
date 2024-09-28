@@ -14,13 +14,12 @@ import { popularQuestionsState, questionsState } from "../../recoil/chat-atoms";
 import { useNavigate, useParams } from "react-router-dom";
 import useRoom from "../../api/room/useRoom";
 import { PopularQuestions } from "../../components/chat/popular/PopularQuestions";
-import { getRoomDetail } from "../../api/room/room";
 
 const CLOUD_WIDTH = 150;
 const CLOUD_HEIGHT = 100;
 
 const ChattingRoomPage = () => {
-  const { getGuests, getQuestions } = useRoom();
+  const { getGuests, getQuestions, getRoomDetail } = useRoom();
   const dataFetchedRef = useRef(null);
   const roomId = localStorage.getItem("roomId");
   const navigate = useNavigate();
@@ -41,7 +40,7 @@ const ChattingRoomPage = () => {
     };
 
     fetchData();
-  }, [roomId, getQuestions, getGuests, navigate, uuid]);
+  }, [roomId, getQuestions, getGuests, navigate, getRoomDetail, uuid]);
   const { handleSendLike } = useChattingRoom(roomId, true);
   const questions = useRecoilValue(questionsState);
   const setPopularQuestions = useSetRecoilState(popularQuestionsState);
