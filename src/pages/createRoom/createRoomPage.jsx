@@ -21,10 +21,12 @@ const CreateRoom = () => {
   const { accessToken } = useAuthCookies();
   const navigate = useNavigate();
   useEffect(() => {
-    if (!accessToken) {
-      navigate("/login");
-    }
+    // if (!accessToken) {
+    //   // navigate("/login");
+    // }
+    console.log(accessToken);
   }, [accessToken, navigate]);
+
   async function handleCreateButton() {
     try {
       // makeRoom 함수 호출

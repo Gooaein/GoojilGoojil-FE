@@ -1,9 +1,14 @@
-import React from "react";
-import styles from "./loginPage.module.css";
-import kakaoLoginLogo from "../../assets/images/logo/kakaoLoginLogo.png";
+import React, { useEffect } from "react";
+import styles from "./loginPage.module.css"; // CSS 모듈로 임포트
+
+import { useNavigate } from "react-router-dom";
+import useAuthCookies from "../../hooks/useAuthCookies";
 import logoW from "../../assets/images/logo/logoW.png";
+import kakaoLoginLogo from "../../assets/images/logo/kakaoLoginLogo.png";
 const LoginPage = () => {
+  const navigate = useNavigate();
   const BASE_URL = process.env.REACT_APP_BACKEND_SERVER_STOMP_URL;
+  const { accessToken } = useAuthCookies();
 
   const getLoginUrl = (provider) => {
     // 여기에 각 소셜 로그인 URL을 반환하는 로직을 구현합니다.
@@ -15,6 +20,11 @@ const LoginPage = () => {
         return "#";
     }
   };
+  useEffect(() => {
+    if (accessToken) {
+      navigate("/createRoom");
+    }
+  }, [navigate, accessToken]);
 
   return (
     <div className={styles.container}>
