@@ -9,8 +9,8 @@ import styles from "./chattingRoomPage.module.css";
 import { QuestionCloud } from "../../components/chat/cloud/QuestionCloud";
 import { ChattingInput } from "../../components/chat/input/ChattingInput";
 import useChattingRoom from "../../stomp/chat/useChattingRoom";
-import { useRecoilValue } from "recoil";
-import { questionsState } from "../../recoil/chat-atoms";
+import { useRecoilValue, useSetRecoilState } from "recoil";
+import { popularQuestionsState, questionsState } from "../../recoil/chat-atoms";
 import { useNavigate, useParams } from "react-router-dom";
 import useRoom from "../../api/room/useRoom";
 import { PopularQuestions } from "../../components/chat/popular/PopularQuestions";
@@ -43,6 +43,7 @@ const ChattingRoomPage = () => {
   }, [roomId, getQuestions, getGuests, navigate, uuid]);
   const { handleSendLike } = useChattingRoom(roomId, true);
   const questions = useRecoilValue(questionsState);
+  const setPopularQuestions = useSetRecoilState(popularQuestionsState);
   const [viewportSize, setViewportSize] = useState({ width: 0, height: 0 });
   const cloudPositionsRef = useRef({});
 
@@ -58,6 +59,12 @@ const ChattingRoomPage = () => {
     window.addEventListener("resize", updateViewportSize);
     return () => window.removeEventListener("resize", updateViewportSize);
   }, [updateViewportSize]);
+
+  // 새로운 useEffect를 추가하여 popularQuestionState 업데이트
+  useEffect(() => {
+    const updatedPopularQuestions = questions.filter((q) => q.likeCount > 3);
+    setPopularQuestions(updatedPopularQuestions);
+  }, [questions, setPopularQuestions]);
 
   const getRandomPosition = useCallback(
     (existingPositions) => {
