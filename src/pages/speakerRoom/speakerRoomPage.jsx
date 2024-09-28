@@ -33,10 +33,17 @@ const SpeakerRoomPage = () => {
 
   useEffect(() => {
     setPersistentQuestions((prevQuestions) => {
-      const newQuestions = sortedQuestions.filter(
-        (newQ) =>
-          !prevQuestions.some((prevQ) => prevQ.questionId === newQ.questionId)
-      );
+      const newQuestions = sortedQuestions
+        .filter(
+          (newQ) =>
+            !prevQuestions.some((prevQ) => prevQ.questionId === newQ.questionId)
+        )
+        .map(({ questionId, title, content, likeCount }) => ({
+          questionId,
+          title,
+          content,
+          likeCount,
+        }));
       return [...prevQuestions, ...newQuestions];
     });
   }, [sortedQuestions]);
