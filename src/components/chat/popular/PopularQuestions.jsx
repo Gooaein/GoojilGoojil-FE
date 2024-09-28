@@ -3,10 +3,12 @@ import { ChevronDown, ChevronUp } from "lucide-react";
 import styles from "./PopularQuestions.module.css";
 import { useRecoilValue } from "recoil";
 import { popularQuestionsState } from "../../../recoil/chat-atoms";
+import { roomDetailState } from "../../../recoil/room-atoms";
 
 export const PopularQuestions = () => {
   const [isExpanded, setIsExpanded] = useState(false);
   const popularQuestions = useRecoilValue(popularQuestionsState);
+  const roomDetail = useRecoilValue(roomDetailState);
 
   const toggleExpand = () => {
     setIsExpanded(!isExpanded);
@@ -15,7 +17,7 @@ export const PopularQuestions = () => {
   return (
     <div className={`${styles.container} ${isExpanded ? styles.expanded : ""}`}>
       <div className={styles.header} onClick={toggleExpand}>
-        <h3>인기 질문</h3>
+        <h3>{roomDetail.name}</h3>
         {isExpanded ? <ChevronUp size={20} /> : <ChevronDown size={20} />}
       </div>
       <div className={styles.questionList}>

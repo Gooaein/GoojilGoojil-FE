@@ -14,6 +14,7 @@ import { popularQuestionsState, questionsState } from "../../recoil/chat-atoms";
 import { useNavigate, useParams } from "react-router-dom";
 import useRoom from "../../api/room/useRoom";
 import { PopularQuestions } from "../../components/chat/popular/PopularQuestions";
+import { getRoomDetail } from "../../api/room/room";
 
 const CLOUD_WIDTH = 150;
 const CLOUD_HEIGHT = 100;
@@ -24,13 +25,13 @@ const ChattingRoomPage = () => {
   const roomId = localStorage.getItem("roomId");
   const navigate = useNavigate();
   const { uuid } = useParams();
-
   useEffect(() => {
     const fetchData = async () => {
       if (roomId && !dataFetchedRef.current) {
         try {
           await getQuestions(roomId);
           await getGuests(roomId);
+          await getRoomDetail(roomId);
           dataFetchedRef.current = true;
         } catch (error) {
           console.error("Error fetching data:", error);
