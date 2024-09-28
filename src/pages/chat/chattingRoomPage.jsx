@@ -8,6 +8,9 @@ import { questionsState } from "../../recoil/chat-atoms";
 import useRoom from "../../api/room/useRoom";
 import { useNavigate, useParams } from "react-router-dom";
 
+const CLOUD_WIDTH = 200;
+const CLOUD_HEIGHT = 150;
+
 const ChattingRoomPage = () => {
   const roomId = localStorage.getItem("roomId");
   const { handleSendLike } = useChattingRoom(roomId, true);
@@ -16,7 +19,6 @@ const ChattingRoomPage = () => {
   const cloudPositionsRef = useRef({});
   const { getQuestions, getGuests } = useRoom();
   const dataFetchedRef = useRef(false);
-  const positionsCalculatedRef = useRef(false);
   const navigate = useNavigate();
   const { uuid } = useParams();
 
@@ -50,70 +52,71 @@ const ChattingRoomPage = () => {
     return () => window.removeEventListener("resize", updateViewportSize);
   }, [updateViewportSize]);
 
-  const getCloudSize = useCallback((likeCount) => {
-    const baseSize = 200;
-    const maxSize = 500;
-    const growthFactor = 40;
-
-    const size = baseSize + likeCount * growthFactor;
-    return Math.min(size, maxSize);
-  }, []);
-
   const getRandomPosition = useCallback(
-    (index, totalQuestions, cloudSize) => {
+    (existingPositions) => {
       const padding = 30;
-      const spawnAreaHeight = viewportSize.height * 0.8;
-      const bottomAreaStart = viewportSize.height * 0.1;
+      let attempts = 0;
+      const maxAttempts = 100;
 
-      const x =
-        Math.random() * (viewportSize.width - cloudSize - padding * 2) +
-        padding;
-      const y = bottomAreaStart + (index / totalQuestions) * spawnAreaHeight;
+      const bottomAreaStart = viewportSize.height * 0.75;
+      const bottomAreaHeight = viewportSize.height * 0.25;
 
-      return { x, y };
+      while (attempts < maxAttempts) {
+        const x =
+          Math.random() * (viewportSize.width - CLOUD_WIDTH - padding * 2) +
+          padding;
+        const y =
+          bottomAreaStart +
+          Math.random() * (bottomAreaHeight - CLOUD_HEIGHT - padding);
+
+        const overlap = existingPositions.some(
+          (pos) =>
+            Math.abs(pos.x - x) < CLOUD_WIDTH &&
+            Math.abs(pos.y - y) < CLOUD_HEIGHT
+        );
+
+        if (!overlap) {
+          return { x, y };
+        }
+
+        attempts++;
+      }
+
+      return {
+        x: Math.random() * (viewportSize.width - CLOUD_WIDTH),
+        y: bottomAreaStart + Math.random() * (bottomAreaHeight - CLOUD_HEIGHT),
+      };
     },
     [viewportSize.width, viewportSize.height]
   );
 
   useEffect(() => {
-    if (!positionsCalculatedRef.current && questions.length > 0) {
-      questions.forEach((question, index) => {
-        if (!cloudPositionsRef.current[question.questionId]) {
-          const cloudSize = getCloudSize(question.likeCount);
-          const position = getRandomPosition(
-            index,
-            questions.length,
-            cloudSize
-          );
-          cloudPositionsRef.current[question.questionId] = {
-            ...position,
-            size: cloudSize,
-          };
-        }
-      });
-      positionsCalculatedRef.current = true;
-    }
-  }, [questions, getRandomPosition, getCloudSize]);
+    questions.forEach((question) => {
+      if (!cloudPositionsRef.current[question.questionId]) {
+        const existingPositions = Object.values(cloudPositionsRef.current);
+        const position = getRandomPosition(existingPositions);
+        cloudPositionsRef.current[question.questionId] = position;
+      }
+    });
+  }, [questions, getRandomPosition]);
 
   return (
     <div className={styles.container}>
       <div className={styles.cloudContainer}>
-        {questions.map((question) => {
-          const cloudInfo = cloudPositionsRef.current[question.questionId];
-          return (
-            <QuestionCloud
-              key={question.questionId}
-              question={question}
-              handleSendLike={handleSendLike}
-              style={{
-                left: `${cloudInfo?.x}px`,
-                top: `${cloudInfo?.y}px`,
-                width: `${cloudInfo?.size}px`,
-                height: `${cloudInfo?.size}px`,
-              }}
-            />
-          );
-        })}
+        {questions.map((question) => (
+          <QuestionCloud
+            key={question.questionId}
+            question={question}
+            handleSendLike={handleSendLike}
+            style={{
+              position: "absolute",
+              left: `${cloudPositionsRef.current[question.questionId]?.x}px`,
+              top: `${cloudPositionsRef.current[question.questionId]?.y}px`,
+              width: `${CLOUD_WIDTH}px`,
+              height: `${CLOUD_HEIGHT}px`,
+            }}
+          />
+        ))}
       </div>
       <ChattingInput />
     </div>
