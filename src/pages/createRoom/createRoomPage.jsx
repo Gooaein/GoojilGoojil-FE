@@ -1,77 +1,106 @@
-// CreateRoom.js
-import React, { useState } from "react";
-import styles from "./createRoomPage.module.css"; // 스타일을 위한 CSS 모듈
-import { BUTTON_LABELS } from "../../constants/introContent"; // 버튼 라벨 import
-
-import RoomComponent from "../../components/room/roomComponent"; // RoomComponent 모달 import
+import React, { useEffect, useState } from "react";
+import styles from "./createRoomPage.module.css";
+import { BUTTON_LABELS } from "../../constants/introContent";
+import RoomComponent from "../../components/room/roomComponent";
+import useRoom from "../../api/room/useRoom";
+import useAuthCookies from "../../hooks/useAuthCookies";
+import { useNavigate } from "react-router-dom";
 
 const CreateRoom = () => {
-  const [modalOpen, setModalOpen] = useState(false); // 모달 상태 관리
-  const [roomUrl, setRoomUrl] = useState(""); // 방 URL 상태 관리
+  const [modalOpen, setModalOpen] = useState(false);
+  const [roomUrl, setRoomUrl] = useState("");
 
-  function handleCreateButton() {
-    // 방 생성 로직 추가
-    console.log("방 생성 버튼 클릭됨.");
-    const generatedUrl = "https://example.com/react-study"; // 생성된 URL
-    setRoomUrl(generatedUrl); // URL 상태 업데이트
-    setModalOpen(true); // 모달 열기
+  // 입력 필드들의 상태 관리
+  const [roomName, setRoomName] = useState("");
+  const [lectureDate, setLectureDate] = useState("");
+  const [lecturePlace, setLecturePlace] = useState("");
+
+  // 임시로 like_threshold 값 설정 (실제 구현에서는 이 값을 적절히 설정해야 함)
+  const [likeThreshold, setLikeThreshold] = useState(10);
+  const { makeRoom } = useRoom();
+  const { accessToken } = useAuthCookies();
+  const navigate = useNavigate();
+  useEffect(() => {
+    if (!accessToken) {
+      navigate("/login");
+    }
+  }, [accessToken, navigate]);
+  async function handleCreateButton() {
+    try {
+      // makeRoom 함수 호출
+      await makeRoom(roomName, lectureDate, lecturePlace, likeThreshold);
+
+      // TODO: 실제 roomId로 URL을 생성해야 함
+      const generatedUrl = `https://example.com/${roomName}`;
+      setRoomUrl(generatedUrl);
+      setModalOpen(true);
+    } catch (error) {
+      console.error("방 생성 중 오류 발생:", error);
+      // 오류 처리 로직 추가 (예: 사용자에게 오류 메시지 표시)
+    }
   }
 
   return (
     <div className={styles.formContainer}>
-      {/* 방 이름 */}
       <div className={styles.inputGroup}>
         <label htmlFor="roomName">1. 방 이름</label>
         <input
           type="text"
           id="roomName"
-          placeholder="url을 입력해주세요..."
+          placeholder="방 이름을  입력해주세요..."
           className={styles.inputBox}
+          value={roomName}
+          onChange={(e) => setRoomName(e.target.value)}
         />
         <div className={styles.requiredText}>*필수 질문입니다</div>
       </div>
 
-      {/* 강의 이름 */}
       <div className={styles.inputGroup}>
-        <label htmlFor="lectureName">2. 강의 이름</label>
+        <label htmlFor="lectureDate">2. 강의 날짜</label>
         <input
-          type="text"
-          id="lectureName"
-          placeholder="진행할 강의명을 입력해주세요..."
+          type="date"
+          id="lectureDate"
           className={styles.inputBox}
+          value={lectureDate}
+          onChange={(e) => setLectureDate(e.target.value)}
         />
       </div>
 
-      {/* 강의 날짜 */}
       <div className={styles.inputGroup}>
-        <label htmlFor="lectureDate">3. 강의 날짜</label>
-        <input type="date" id="lectureDate" className={styles.inputBox} />
-      </div>
-
-      {/* 강의 장소 */}
-      <div className={styles.inputGroup}>
-        <label htmlFor="lecturePlace">4. 강의 장소</label>
+        <label htmlFor="lecturePlace">3. 강의 장소</label>
         <input
           type="text"
           id="lecturePlace"
           placeholder="강의가 진행되는 장소명을 입력해주세요..."
           className={styles.inputBox}
+          value={lecturePlace}
+          onChange={(e) => setLecturePlace(e.target.value)}
         />
       </div>
 
-      {/* 방 만들기 버튼 추가 */}
+      <div className={styles.inputGroup}>
+        <label htmlFor="lecturePlace">4. 저장되는 최소 공감수</label>
+        <input
+          type="number"
+          id="likeThreshold"
+          placeholder="명예의 전당에 저장되는 최소 공감 수를 설정하세요!"
+          className={styles.inputBox}
+          value={likeThreshold}
+          onChange={(e) => setLikeThreshold(e.target.value)}
+        />
+      </div>
+
       <div className={styles.buttonContainer}>
         <button className={styles.button} onClick={handleCreateButton}>
           {BUTTON_LABELS.CREATE_ROOM}
         </button>
       </div>
 
-      {/* RoomComponent 모달 */}
       {modalOpen && (
         <RoomComponent
-          isOpen={modalOpen} // 모달 열림 상태
-          onClose={() => setModalOpen(false)} // 모달 닫기 함수 전달
-          url={roomUrl} // 생성된 URL 전달
+          isOpen={modalOpen}
+          onClose={() => setModalOpen(false)}
+          url={roomUrl}
         />
       )}
     </div>

@@ -1,13 +1,25 @@
 import React from "react";
-import styles from "./loginPage.module.css"; // CSS 모듈로 임포트
-
+import styles from "./loginPage.module.css";
+import kakaoLoginLogo from "../../assets/images/logo/kakaoLoginLogo.png";
+import logoW from "../../assets/images/logo/logoW.png";
 const LoginPage = () => {
+  const BASE_URL = process.env.REACT_APP_BACKEND_SERVER_STOMP_URL;
+
+  const getLoginUrl = (provider) => {
+    // 여기에 각 소셜 로그인 URL을 반환하는 로직을 구현합니다.
+    switch (provider) {
+      case "kakao":
+        return `https://${BASE_URL}/oauth2/authorization/${provider}`;
+      // 다른 소셜 로그인 URL도 필요에 따라 추가할 수 있습니다.
+      default:
+        return "#";
+    }
+  };
+
   return (
     <div className={styles.container}>
-      {" "}
-      {/* .container 클래스를 추가 */}
       <header className={styles.header}>
-        <img src="img/logoW.png" alt="로고" className={styles.logo} />
+        <img src={logoW} alt="로고" className={styles.logo} />
       </header>
       <main className={styles["main-content"]}>
         <h3>
@@ -15,18 +27,11 @@ const LoginPage = () => {
           <br /> 방을 만들기 위해, 소셜 로그인을 진행해주세요
         </h3>
       </main>
-      <a href="#" className={styles["social-button-1"]}>
-        <img src="./kakao.png" alt="카카오톡으로 계속하기" />
+      <a href={getLoginUrl("kakao")} className={styles["social-button"]}>
+        <img src={kakaoLoginLogo} alt="카카오톡으로 계속하기" />
+        카카오톡으로 계속하기
       </a>
-      <a href="#" className={styles["social-button-2"]}>
-        <img src="./naver.png" alt="네이버로 계속하기" />
-      </a>
-      <a href="#" className={styles["social-button-3"]}>
-        <img src="./facebook.png" alt="페이스북으로 계속하기" />
-      </a>
-      <a href="#" className={styles["social-button-4"]}>
-        <img src="./apple.png" alt="Apple로 계속하기" />
-      </a>
+      {/* 다른 소셜 로그인 버튼들도 필요에 따라 추가할 수 있습니다. */}
     </div>
   );
 };

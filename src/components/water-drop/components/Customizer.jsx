@@ -4,7 +4,7 @@ import { featureOptions } from "../../../constants/waterDropContent";
 import { useRecoilState } from "recoil";
 import { characterState } from "../../../recoil/character-atoms";
 import { createCompositeImage } from "../../../util/createCompositeImage";
-import { sendAvartar } from "../../../api/room/room";
+import { sendAvatar } from "../../../api/room/room";
 import { useNavigate, useParams } from "react-router-dom";
 export const Customizer = () => {
   const [character, setCharacter] = useRecoilState(characterState);
@@ -24,7 +24,7 @@ export const Customizer = () => {
       const compositeImageData = await createCompositeImage(character);
       const compositePrefixImageData = removeMimeTypePrefix(compositeImageData);
       // 서버로 캐릭터 데이터와 합성 이미지를 함께 전송
-      await sendAvartar(compositePrefixImageData, uuid);
+      await sendAvatar(compositePrefixImageData, uuid);
       navigate(`/${uuid}/chattingRoom`);
       alert("캐릭터가 저장되었습니다!");
     } catch (error) {
