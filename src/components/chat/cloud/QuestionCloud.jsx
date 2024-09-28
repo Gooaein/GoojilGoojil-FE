@@ -18,9 +18,9 @@ const getOpacity = (remainingTime) => {
 };
 
 const getCloudSize = (likeCount) => {
-  const baseSize = 100; // 기본 크기 (px)
-  const maxSize = 200; // 최대 크기 (px)
-  const growthFactor = 5; // 좋아요 1개당 증가하는 크기 (px)
+  const baseSize = 200; // 기본 크기 (px)
+  const maxSize = 500; // 최대 크기 (px)
+  const growthFactor = 40; // 좋아요 1개당 증가하는 크기 (px)
 
   const size = baseSize + likeCount * growthFactor;
   return Math.min(size, maxSize);
