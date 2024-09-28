@@ -51,55 +51,56 @@ const ChattingRoomPage = () => {
     window.addEventListener("resize", updateViewportSize);
     return () => window.removeEventListener("resize", updateViewportSize);
   }, [updateViewportSize]);
-  const getRandomPosition = useCallback(
-    (existingPositions) => {
-      const padding = 30;
+
+  const getRandomPosition = useCallback(() => {
+    const padding = 20;
+    const inputHeight = 100; // Height of ChattingInput
+    const availableHeight =
+      viewportSize.height - inputHeight - CLOUD_HEIGHT - padding;
+
+    const x =
+      Math.random() * (viewportSize.width - CLOUD_WIDTH - padding * 2) +
+      padding;
+    const y = Math.random() * (availableHeight - padding) + padding;
+
+    return { x, y };
+  }, [viewportSize.width, viewportSize.height]);
+
+  const checkOverlap = useCallback((position, existingPositions) => {
+    return existingPositions.some(
+      (pos) =>
+        Math.abs(pos.x - position.x) < CLOUD_WIDTH &&
+        Math.abs(pos.y - position.y) < CLOUD_HEIGHT
+    );
+  }, []);
+
+  const updateCloudPositions = useCallback(() => {
+    const newPositions = {};
+    const existingPositions = [];
+
+    questions.forEach((question) => {
+      let position;
       let attempts = 0;
-      const maxAttempts = 100;
+      const maxAttempts = 50;
 
-      // Use more of the screen's height
-      const topAreaStart = viewportSize.height * 0.1; // Start from 10% of the screen height
-      const availableHeight = viewportSize.height * 0.8; // Use 80% of the screen height
-
-      while (attempts < maxAttempts) {
-        const x =
-          Math.random() * (viewportSize.width - CLOUD_WIDTH - padding * 2) +
-          padding;
-        const y =
-          topAreaStart +
-          Math.random() * (availableHeight - CLOUD_HEIGHT - padding);
-
-        const overlap = existingPositions.some(
-          (pos) =>
-            Math.abs(pos.x - x) < CLOUD_WIDTH &&
-            Math.abs(pos.y - y) < CLOUD_HEIGHT
-        );
-
-        if (!overlap) {
-          return { x, y };
-        }
-
+      do {
+        position = getRandomPosition();
         attempts++;
-      }
+      } while (
+        checkOverlap(position, existingPositions) &&
+        attempts < maxAttempts
+      );
 
-      // Fallback position if no non-overlapping position is found
-      return {
-        x: Math.random() * (viewportSize.width - CLOUD_WIDTH),
-        y: topAreaStart + Math.random() * (availableHeight - CLOUD_HEIGHT),
-      };
-    },
-    [viewportSize.width, viewportSize.height]
-  );
+      newPositions[question.questionId] = position;
+      existingPositions.push(position);
+    });
+
+    cloudPositionsRef.current = newPositions;
+  }, [questions, getRandomPosition, checkOverlap]);
 
   useEffect(() => {
-    questions.forEach((question) => {
-      if (!cloudPositionsRef.current[question.questionId]) {
-        const existingPositions = Object.values(cloudPositionsRef.current);
-        const position = getRandomPosition(existingPositions);
-        cloudPositionsRef.current[question.questionId] = position;
-      }
-    });
-  }, [questions, getRandomPosition]);
+    updateCloudPositions();
+  }, [updateCloudPositions, questions]);
 
   return (
     <div className={styles.container}>
@@ -116,10 +117,13 @@ const ChattingRoomPage = () => {
               width: `${CLOUD_WIDTH}px`,
               height: `${CLOUD_HEIGHT}px`,
             }}
+            className={styles.cloudAnimation}
           />
         ))}
       </div>
-      <ChattingInput />
+      <div className={styles.chattingInputContainer}>
+        <ChattingInput />
+      </div>
     </div>
   );
 };
