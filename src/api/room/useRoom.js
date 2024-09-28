@@ -80,8 +80,8 @@ export const useRoom = () => {
 
   const getQuestions = async (roomId) => {
     try {
-      const data = await roomAPI.getQuestions(roomId);
-      setQuestions(data.data);
+      const response = await roomAPI.getQuestions(roomId);
+      setQuestions(response.data.data);
     } catch (error) {
       console.error("Failed to get questions:", error);
     }
