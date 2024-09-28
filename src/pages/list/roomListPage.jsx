@@ -1,22 +1,19 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect } from "react";
 import styles from "./roomListPage.module.css";
 import copyIcon from "./copy.png";
 import useRoom from "../../api/room/useRoom";
 import { useNavigate } from "react-router-dom";
+import { useRecoilState } from "recoil";
+import { roomsState } from "../../recoil/room-atoms";
 
 const RoomListPage = () => {
   const { getRooms } = useRoom();
-  const [rooms, setRooms] = useState([]);
   const navigate = useNavigate();
+  const rooms = useRecoilState(roomsState);
   useEffect(() => {
     const fetchRooms = async () => {
       try {
-        const response = await getRooms();
-        if (response.success) {
-          setRooms(response.data);
-        } else {
-          console.error("Failed to fetch rooms:", response.error);
-        }
+        await getRooms();
       } catch (error) {
         console.error("Error fetching rooms:", error);
       }
