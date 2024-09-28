@@ -20,6 +20,8 @@ const ChattingRoomPage = () => {
   const { getQuestions, getGuests } = useRoom();
   const dataFetchedRef = useRef(false);
   const navigate = useNavigate();
+  const [cloudPositions, setCloudPositions] = useState({});
+
   const { uuid } = useParams();
 
   const updateViewportSize = useCallback(() => {
@@ -75,28 +77,30 @@ const ChattingRoomPage = () => {
   }, []);
 
   const updateCloudPositions = useCallback(() => {
-    const newPositions = {};
-    const existingPositions = [];
+    const newPositions = { ...cloudPositions };
+    const existingPositions = Object.values(newPositions);
 
     questions.forEach((question) => {
-      let position;
-      let attempts = 0;
-      const maxAttempts = 50;
+      if (!newPositions[question.questionId]) {
+        let position;
+        let attempts = 0;
+        const maxAttempts = 50;
 
-      do {
-        position = getRandomPosition();
-        attempts++;
-      } while (
-        checkOverlap(position, existingPositions) &&
-        attempts < maxAttempts
-      );
+        do {
+          position = getRandomPosition();
+          attempts++;
+        } while (
+          checkOverlap(position, existingPositions) &&
+          attempts < maxAttempts
+        );
 
-      newPositions[question.questionId] = position;
-      existingPositions.push(position);
+        newPositions[question.questionId] = position;
+        existingPositions.push(position);
+      }
     });
 
-    cloudPositionsRef.current = newPositions;
-  }, [questions, getRandomPosition, checkOverlap]);
+    setCloudPositions(newPositions);
+  }, [questions, getRandomPosition, checkOverlap, cloudPositions]);
 
   useEffect(() => {
     updateCloudPositions();
