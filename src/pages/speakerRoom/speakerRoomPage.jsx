@@ -30,26 +30,31 @@ const SpeakerRoomPage = () => {
   }, [roomId]);
 
   useEffect(() => {
+    console.log("Incoming questions:", incomingQuestions);
     setPersistentQuestions((prevQuestions) => {
       const newQuestions = incomingQuestions.filter(
         (newQ) =>
           !prevQuestions.some((prevQ) => prevQ.questionId === newQ.questionId)
       );
-      return [...prevQuestions, ...newQuestions];
+      const updatedQuestions = [...prevQuestions, ...newQuestions];
+      console.log("Updated persistent questions:", updatedQuestions);
+      return updatedQuestions;
     });
   }, [incomingQuestions]);
 
   const filterAndSortQuestions = useCallback(() => {
+    console.log("Filtering and sorting questions. Room detail:", roomDetail);
     const filtered = persistentQuestions.filter(
       (q) => q.likeCount >= (roomDetail?.like_threshold || 0)
     );
     const sorted = filtered.sort((a, b) => b.likeCount - a.likeCount);
+    console.log("Sorted questions:", sorted);
     setSortedQuestions(sorted);
-  }, [persistentQuestions, roomDetail?.like_threshold]);
+  }, [persistentQuestions, roomDetail]);
 
   useEffect(() => {
     filterAndSortQuestions();
-  }, [filterAndSortQuestions]);
+  }, [filterAndSortQuestions, persistentQuestions, roomDetail]);
 
   const handleConfirm = (questionId) => {
     console.log("Question confirmed:", questionId);
@@ -68,6 +73,8 @@ const SpeakerRoomPage = () => {
     return `${year}년 ${month}월 ${day}일 ${hour}시 ${minute}분`;
   };
 
+  console.log("Rendering with sorted questions:", sortedQuestions);
+
   return (
     <div className={styles.container}>
       {roomDetail && (
@@ -79,28 +86,32 @@ const SpeakerRoomPage = () => {
         </div>
       )}
       <div className={styles.cardGrid}>
-        {sortedQuestions.map((question) => (
-          <div key={question.questionId} className={styles.card}>
-            <h2>{question.title}</h2>
-            <p>{question.content}</p>
-            <div className={styles.buttonGroup}>
-              <button className={styles.likeButton}>
-                <img
-                  src={heartImage}
-                  alt="like"
-                  className={styles.heartImage}
-                />
-                {question.likeCount}
-              </button>
-              <button
-                className={styles.confirmButton}
-                onClick={() => handleConfirm(question.questionId)}
-              >
-                확인
-              </button>
+        {sortedQuestions.length === 0 ? (
+          <p>No questions to display.</p>
+        ) : (
+          sortedQuestions.map((question) => (
+            <div key={question.questionId} className={styles.card}>
+              <h2>{question.title}</h2>
+              <p>{question.content}</p>
+              <div className={styles.buttonGroup}>
+                <button className={styles.likeButton}>
+                  <img
+                    src={heartImage}
+                    alt="like"
+                    className={styles.heartImage}
+                  />
+                  {question.likeCount}
+                </button>
+                <button
+                  className={styles.confirmButton}
+                  onClick={() => handleConfirm(question.questionId)}
+                >
+                  확인
+                </button>
+              </div>
             </div>
-          </div>
-        ))}
+          ))
+        )}
       </div>
     </div>
   );

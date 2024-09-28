@@ -1,1 +1,1 @@
-export const QUESTION_LIFETIME = 60000; // 60 seconds in milliseconds
+export const QUESTION_LIFETIME = 120000; // 60 seconds in milliseconds
