@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useCallback, useMemo } from "react";
+import React, { useEffect, useState, useCallback } from "react";
 import styles from "./speakerRoomPage.module.css";
 import useChattingRoom from "../../stomp/chat/useChattingRoom";
 import heartImage from "./heart.png";
@@ -8,11 +8,8 @@ import useRoom from "../../api/room/useRoom";
 
 const SpeakerRoomPage = () => {
   const roomId = localStorage.getItem("roomId");
-  const { questions: incomingQuestions, isConnected } = useChattingRoom(
-    roomId,
-    true
-  );
-  const [persistentQuestions, setPersistentQuestions] = useState([]);
+  const { questions, isConnected } = useChattingRoom(roomId, true);
+  const [sortedQuestions, setSortedQuestions] = useState([]);
   const roomDetail = useRecoilValue(roomDetailState);
   const { getRoomDetail } = useRoom();
 
@@ -28,28 +25,23 @@ const SpeakerRoomPage = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [roomId]);
 
-  useEffect(() => {
-    setPersistentQuestions((prevQuestions) => {
-      const newQuestions = incomingQuestions.filter(
-        (newQ) =>
-          !prevQuestions.some((prevQ) => prevQ.questionId === newQ.questionId)
-      );
-      return [...prevQuestions, ...newQuestions];
-    });
-  }, [incomingQuestions]);
-
-  const sortedQuestions = useMemo(() => {
-    const threshold = roomDetail?.like_threshold || 0;
-    return persistentQuestions
-      .filter((q) => q.likeCount >= threshold)
-      .sort((a, b) => b.likeCount - a.likeCount);
-  }, [persistentQuestions, roomDetail?.like_threshold]);
-
-  const handleConfirm = useCallback((questionId) => {
-    setPersistentQuestions((prevQuestions) =>
-      prevQuestions.filter((q) => q.questionId !== questionId)
+  const filterAndSortQuestions = useCallback(() => {
+    const filtered = questions.filter(
+      (q) => q.likeCount >= (roomDetail?.like_threshold || 0)
     );
-  }, []);
+    const sorted = filtered.sort((a, b) => b.likeCount - a.likeCount);
+    setSortedQuestions(sorted);
+    
+  }, [questions, roomDetail?.like_threshold]);
+
+  useEffect(() => {
+    filterAndSortQuestions();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [questions, roomDetail?.like_threshold]);
+
+  const handleConfirm = (questionId) => {
+    console.log("Question confirmed:", questionId);
+  };
 
   if (!isConnected) {
     return <div>Connecting to the room...</div>;
@@ -72,32 +64,28 @@ const SpeakerRoomPage = () => {
         </div>
       )}
       <div className={styles.cardGrid}>
-        {sortedQuestions.length === 0 ? (
-          <p>No questions to display.</p>
-        ) : (
-          sortedQuestions.map((question) => (
-            <div key={question.questionId} className={styles.card}>
-              <h2>{question.title}</h2>
-              <p>{question.content}</p>
-              <div className={styles.buttonGroup}>
-                <button className={styles.likeButton}>
-                  <img
-                    src={heartImage}
-                    alt="like"
-                    className={styles.heartImage}
-                  />
-                  {question.likeCount}
-                </button>
-                <button
-                  className={styles.confirmButton}
-                  onClick={() => handleConfirm(question.questionId)}
-                >
-                  확인
-                </button>
-              </div>
+        {sortedQuestions.map((question) => (
+          <div key={question.questionId} className={styles.card}>
+            <h2>{question.title}</h2>
+            <p>{question.content}</p>
+            <div className={styles.buttonGroup}>
+              <button className={styles.likeButton}>
+                <img
+                  src={heartImage}
+                  alt="like"
+                  className={styles.heartImage}
+                />
+                {question.likeCount}
+              </button>
+              <button
+                className={styles.confirmButton}
+                onClick={() => handleConfirm(question.questionId)}
+              >
+                확인
+              </button>
             </div>
-          ))
-        )}
+          </div>
+        ))}
       </div>
     </div>
   );
