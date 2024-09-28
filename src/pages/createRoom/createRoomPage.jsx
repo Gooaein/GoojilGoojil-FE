@@ -55,6 +55,7 @@ const CreateRoom = () => {
           setRoomUrl(generatedUrl);
           setModalOpen(true);
         } catch (error) {
+          navigate("/login");
           console.error("방 생성 중 오류 발생:", error);
         }
       },

@@ -88,7 +88,7 @@ const ChattingRoomPage = () => {
 
       return {
         x: Math.random() * (viewportSize.width - CLOUD_WIDTH),
-        y: Math.random() * (viewportSize.height - CLOUD_HEIGHT),
+        y: Math.random() * (viewportSize.height - CLOUD_HEIGHT - 100),
       };
     },
     [viewportSize.width, viewportSize.height]
