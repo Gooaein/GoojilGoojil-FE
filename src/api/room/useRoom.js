@@ -89,7 +89,7 @@ export const useRoom = () => {
     try {
       const response = await roomAPI.getRooms();
       console.log("getRooms", response);
-      setRooms(response.data);
+      setRooms(response.data.data);
     } catch (error) {
       console.error("Failed to get rooms:", error);
     }
@@ -99,7 +99,7 @@ export const useRoom = () => {
     try {
       const response = await roomAPI.getRoomDetail(roomId);
       console.log("getDetailQuestion, ", response);
-      setRoomDetail(response.data);
+      setRoomDetail(response.data.data);
     } catch (error) {
       console.error("Failed to get questions:", error);
     }
