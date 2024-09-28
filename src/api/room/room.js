@@ -6,12 +6,13 @@ export const getInitialRoomData = async (roomId) => {
 
 //TODO- 나중에 실제 roomId로 바꿔야 함.
 export const makeRoom = async (name, date, location, like_threshold) => {
-  sendRequest(userRoomsIntance, "post", ``, {
+  const data = sendRequest(userRoomsIntance, "post", ``, {
     name,
     date,
     location,
     like_threshold,
   });
+  return data;
 };
 
 //강연자가 방목록을 얻을 때,
