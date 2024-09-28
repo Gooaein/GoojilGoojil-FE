@@ -85,7 +85,7 @@ export const useRoom = () => {
       const response = await roomAPI.getQuestions(roomId);
       const allQuestions = response.data.data;
       const popularQuestions = allQuestions.filter(
-        (question) => question.likeCount >= 5
+        (question) => question.likeCount >= 2
       );
       setPopularQuestions(popularQuestions);
       return response;
