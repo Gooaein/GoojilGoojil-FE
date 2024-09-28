@@ -28,7 +28,7 @@ export const PopularQuestions = () => {
   return (
     <div className={`${styles.container} ${isExpanded ? styles.expanded : ""}`}>
       <div className={styles.header} onClick={toggleExpand}>
-        <h3>{roomDetail.name || "Room Name Not Available"}</h3>
+        <h3>{roomDetail.name || "실시간 인기 채팅"}</h3>
         {isExpanded ? <ChevronUp size={20} /> : <ChevronDown size={20} />}
       </div>
       <div className={styles.questionList}>
