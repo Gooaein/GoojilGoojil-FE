@@ -13,6 +13,7 @@ import { useRecoilValue } from "recoil";
 import { questionsState } from "../../recoil/chat-atoms";
 import { useNavigate, useParams } from "react-router-dom";
 import useRoom from "../../api/room/useRoom";
+import { PopularQuestions } from "../../components/chat/popular/PopularQuestions";
 
 const CLOUD_WIDTH = 150;
 const CLOUD_HEIGHT = 100;
@@ -105,6 +106,7 @@ const ChattingRoomPage = () => {
 
   return (
     <div className={styles.container}>
+      <PopularQuestions />
       <div className={styles.cloudContainer}>
         {questions.map((question) => (
           <QuestionCloud

@@ -5,6 +5,10 @@ export const questionsState = atom({
   default: [],
 });
 
+export const popularQuestionsState = atom({
+  key: "popularQuestionsState",
+  default: [],
+});
 export const activeUsersState = atom({
   key: "activeUsersState",
   default: [],

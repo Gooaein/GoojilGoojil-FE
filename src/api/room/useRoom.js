@@ -10,16 +10,20 @@ import {
 } from "../../recoil/room-atoms";
 import useAuthCookies from "../../hooks/useAuthCookies";
 import { useNavigate } from "react-router-dom";
-import { activeUsersState, questionsState } from "../../recoil/chat-atoms";
+import {
+  activeUsersState,
+  popularQuestionsState,
+} from "../../recoil/chat-atoms";
 import { sendAvatar } from "./avatar";
 
 export const useRoom = () => {
   const setRoomData = useSetRecoilState(roomDataState);
   const setReview = useSetRecoilState(reviewState);
   const setActiveUsers = useSetRecoilState(activeUsersState);
-  const setQuestions = useSetRecoilState(questionsState);
   const setRoomDetail = useSetRecoilState(roomDetailState);
   const setRooms = useSetRecoilState(roomsState);
+  const setPopularQuestions = useSetRecoilState(popularQuestionsState);
+
   const { accessToken } = useAuthCookies();
   const navigate = useNavigate();
 
@@ -79,7 +83,12 @@ export const useRoom = () => {
   const getQuestions = async (roomId) => {
     try {
       const response = await roomAPI.getQuestions(roomId);
-      setQuestions(response.data.data);
+      const allQuestions = response.data.data;
+      const popularQuestions = allQuestions.filter(
+        (question) => question.likeCount >= 5
+      );
+      setPopularQuestions(popularQuestions);
+      return response;
     } catch (error) {
       console.error("Failed to get questions:", error);
     }
