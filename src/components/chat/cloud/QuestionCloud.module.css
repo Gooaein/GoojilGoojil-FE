@@ -1,51 +1,33 @@
 .questionCloud {
-  width: 10%;
-  height: 5vw;
-  background-color: hsla(0, 0%, 100%, 0);
-  margin-bottom: 10px;
-  background-repeat: no-repeat;
+  position: absolute;
+  width: 150px;
+  height: 100px;
   background-size: contain;
+  background-repeat: no-repeat;
   background-position: center;
-
-  /* 추가된 부분: flexbox를 사용하여 내부 콘텐츠 중앙 정렬 */
   display: flex;
-  flex-direction: column;
-  justify-content: center;
   align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  user-select: none;
 }
 
 .questionCloud p {
-  margin: 0; /* 기본 마진 제거 */
-  text-align: center; /* 텍스트 중앙 정렬 */
-}
-
-.questionCloudContainer {
-  position: relative;
-}
-
-.contentPopover {
-  position: absolute;
-  top: 100%;
-  left: 0;
-  background-color: white;
-  border: 1px solid #ddd;
+  font-size: 14px;
+  text-align: center;
+  margin: 0;
   padding: 10px;
-  border-radius: 5px;
-  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-  z-index: 1000;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  max-width: 90%;
 }
 
-.likeButton {
-  background-color: #f0f0f0;
-  border: none;
-  padding: 5px 10px;
-  border-radius: 5px;
-  cursor: pointer;
-  margin-top: 10px;
-}
-
-.likeButton:hover {
-  background-color: #e0e0e0;
+.questionCloud:hover {
+  transform: scale(1.05);
 }
 
 .modalOverlay {
@@ -54,10 +36,10 @@
   left: 0;
   right: 0;
   bottom: 0;
-  background-color: rgba(0, 0, 0, 0.7);
+  background-color: rgba(0, 0, 0, 0.5);
   display: flex;
-  justify-content: center;
   align-items: center;
+  justify-content: center;
   z-index: 1000;
 }
 
@@ -65,16 +47,15 @@
   background-color: white;
   padding: 20px;
   border-radius: 10px;
-  width: 80%;
-  max-width: 500px;
-  max-height: 80vh;
+  max-width: 80%;
+  max-height: 80%;
   overflow-y: auto;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
 }
 
 .modalTitle {
-  font-size: 24px;
-  margin-bottom: 15px;
-  text-align: center;
+  font-size: 20px;
+  margin-bottom: 10px;
 }
 
 .modalBody {
@@ -84,17 +65,33 @@
 }
 
 .likeButton {
-  display: block;
-  margin: 0 auto;
-  padding: 10px 20px;
   background-color: #4caf50;
-  color: white;
   border: none;
-  border-radius: 5px;
-  cursor: pointer;
+  color: white;
+  padding: 10px 20px;
+  text-align: center;
+  text-decoration: none;
+  display: inline-block;
   font-size: 16px;
+  margin: 4px 2px;
+  cursor: pointer;
+  border-radius: 5px;
+  transition: background-color 0.3s;
 }
 
 .likeButton:hover {
   background-color: #45a049;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.questionCloud {
+  animation: fadeIn 0.5s ease-out;
 }

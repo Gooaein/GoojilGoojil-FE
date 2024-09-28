@@ -25,7 +25,9 @@ export const StompProvider = ({ children }) => {
       connectHeaders: {
         Authorization: authToken,
       },
-
+      debug: (str) => {
+        console.log(str);
+      },
       onConnect: () => {
         console.log("WebSocket connection established!");
         setIsConnected(true);
