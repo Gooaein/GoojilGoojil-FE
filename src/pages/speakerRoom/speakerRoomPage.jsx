@@ -33,10 +33,21 @@ const SpeakerRoomPage = () => {
 
   useEffect(() => {
     setPersistentQuestions((prevQuestions) => {
+      // Update existing questions' like counts
+      const updatedQuestions = prevQuestions.map((prevQ) => {
+        const updatedQ = questions.find(
+          (q) => q.questionId === prevQ.questionId
+        );
+        return updatedQ ? { ...prevQ, likeCount: updatedQ.likeCount } : prevQ;
+      });
+
+      // Add new questions
       const newQuestions = sortedQuestions
         .filter(
           (newQ) =>
-            !prevQuestions.some((prevQ) => prevQ.questionId === newQ.questionId)
+            !updatedQuestions.some(
+              (prevQ) => prevQ.questionId === newQ.questionId
+            )
         )
         .map(({ questionId, title, content, likeCount }) => ({
           questionId,
@@ -44,9 +55,12 @@ const SpeakerRoomPage = () => {
           content,
           likeCount,
         }));
-      return [...prevQuestions, ...newQuestions];
+
+      return [...updatedQuestions, ...newQuestions].sort(
+        (a, b) => b.likeCount - a.likeCount
+      );
     });
-  }, [sortedQuestions]);
+  }, [sortedQuestions, questions]);
 
   const handleConfirm = (questionId) => {
     console.log("Question confirmed:", questionId);
