@@ -45,7 +45,7 @@ export const useRoom = () => {
           like_threshold
         );
         console.log(data);
-        setRoomData(data);
+        setRoomData(data.data.uuid);
         return data; // 방 생성 후 roomId를 포함한 데이터를 반환
       } catch (error) {
         console.error("Failed to create room:", error);

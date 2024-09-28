@@ -6,6 +6,8 @@ import useRoom from "../../api/room/useRoom";
 import useAuthCookies from "../../hooks/useAuthCookies";
 import { useNavigate } from "react-router-dom";
 import { formatDateToISO } from "../../util/currentTimeUtil";
+import { useRecoilValue } from "recoil";
+import { roomDataState } from "../../recoil/room-atoms";
 
 const CreateRoom = () => {
   const [modalOpen, setModalOpen] = useState(false);
@@ -19,7 +21,7 @@ const CreateRoom = () => {
   const { makeRoom } = useRoom();
   const { accessToken } = useAuthCookies();
   const navigate = useNavigate();
-
+  const urlUUID = useRecoilValue(roomDataState);
   useEffect(() => {
     console.log(accessToken);
   }, [accessToken, navigate]);
@@ -42,7 +44,7 @@ const CreateRoom = () => {
         likeThreshold
       );
 
-      const generatedUrl = `https://example.com/${roomName}`;
+      const generatedUrl = `https://goojilgoojil.com/${urlUUID}`;
       setRoomUrl(generatedUrl);
       setModalOpen(true);
     } catch (error) {
