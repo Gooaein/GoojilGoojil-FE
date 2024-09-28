@@ -10,7 +10,7 @@ const IntroComponent = () => {
   const navigate = useNavigate();
 
   function handleJoinButton() {
-    navigate("/customize");
+    navigate("/createRoom");
   }
 
   useEffect(() => {
@@ -38,11 +38,8 @@ const IntroComponent = () => {
               data-aos="fade-up"
               data-aos-delay="600"
             >
-              <button className={styles.button}>
-                {BUTTON_LABELS.CREATE_ROOM}
-              </button>
               <button className={styles.button} onClick={handleJoinButton}>
-                {BUTTON_LABELS.JOIN_ROOM}
+                {BUTTON_LABELS.CREATE_ROOM}
               </button>
             </div>
           )}

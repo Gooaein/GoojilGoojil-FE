@@ -1,8 +1,8 @@
 .container {
-  padding: 20px;
-  height: 88vh;
+  height: 100vh;
   background: linear-gradient(to bottom, #577ef5, #ffcaca);
   position: relative;
+  overflow: hidden;
 }
 
 .cloudContainer {
@@ -10,5 +10,30 @@
   top: 0;
   left: 0;
   right: 0;
-  bottom: 60px; /* Adjust based on your ChattingInput height */
+  bottom: 10vh; /* Adjust based on your ChattingInput height */
+}
+
+.cloudAnimation {
+  animation: fadeIn 0.5s ease-out;
+  transition: all 0.3s ease;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: scale(0.9);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+/* 추가: ChattingInput을 화면 하단에 고정 */
+.chattingInputContainer {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 100px; /* Adjust as needed */
 }

@@ -10,6 +10,8 @@ const ActiveUsers = () => {
     return (
       <div className={styles.emptyState}>현재 활성 사용자가 없습니다.</div>
     );
+  } else {
+    console.log(`activeUsers:`, activeUsers);
   }
 
   return (
@@ -18,7 +20,7 @@ const ActiveUsers = () => {
         {activeUsers.map((user) => (
           <div key={user.id} className={styles.avatarItem}>
             <img
-              src={user.avatar}
+              src={`data:image/png;base64,${user.avatarBase64}`}
               alt={`${user.name}'s avatar`}
               className={styles.avatar}
             />

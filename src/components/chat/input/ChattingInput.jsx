@@ -21,10 +21,7 @@ export const ChattingInput = () => {
     const content = value.slice(colonIndex + 1).trim();
 
     if (title && content) {
-      handleSendQuestion({
-        title: title,
-        content: content,
-      });
+      handleSendQuestion({ title, content } );
       console.log({
         title: title,
         content: content,
