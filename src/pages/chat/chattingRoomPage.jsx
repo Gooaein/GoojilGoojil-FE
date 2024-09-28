@@ -16,6 +16,8 @@ import { useNavigate, useParams } from "react-router-dom";
 
 const CLOUD_WIDTH = 150;
 const CLOUD_HEIGHT = 100;
+const CHATTING_INPUT_HEIGHT = 100; // Assuming ChattingInput height is 100px
+const PADDING = 20;
 
 const ChattingRoomPage = () => {
   const roomId = localStorage.getItem("roomId");
@@ -23,10 +25,12 @@ const ChattingRoomPage = () => {
   const questions = useRecoilValue(questionsState);
   const [viewportSize, setViewportSize] = useState({ width: 0, height: 0 });
   const cloudPositionsRef = useRef({});
+
   const { getGuests, getQuestions } = useRoom();
   const dataFetchedRef = useRef(null);
   const navigate = useNavigate();
   const { uuid } = useParams();
+
   const updateViewportSize = useCallback(() => {
     setViewportSize({
       width: window.innerWidth,
@@ -59,17 +63,18 @@ const ChattingRoomPage = () => {
 
   const getRandomPosition = useCallback(
     (existingPositions) => {
-      const padding = 20;
+      const maxWidth = viewportSize.width - CLOUD_WIDTH - PADDING * 2;
+      const maxHeight =
+        viewportSize.height -
+        CHATTING_INPUT_HEIGHT -
+        CLOUD_HEIGHT -
+        PADDING * 2;
       let attempts = 0;
       const maxAttempts = 100;
 
       while (attempts < maxAttempts) {
-        const x =
-          Math.random() * (viewportSize.width - CLOUD_WIDTH - padding * 2) +
-          padding;
-        const y =
-          Math.random() * (viewportSize.height - CLOUD_HEIGHT - padding * 2) +
-          padding;
+        const x = Math.random() * maxWidth + PADDING;
+        const y = Math.random() * maxHeight + PADDING;
 
         const overlap = existingPositions.some(
           (pos) =>
@@ -84,9 +89,10 @@ const ChattingRoomPage = () => {
         attempts++;
       }
 
+      // Fallback position if no non-overlapping position is found
       return {
-        x: Math.random() * (viewportSize.width - CLOUD_WIDTH),
-        y: Math.random() * (viewportSize.height - CLOUD_HEIGHT),
+        x: Math.random() * maxWidth + PADDING,
+        y: Math.random() * maxHeight + PADDING,
       };
     },
     [viewportSize.width, viewportSize.height]
