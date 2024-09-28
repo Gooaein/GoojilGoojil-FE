@@ -6,6 +6,7 @@ import useChattingRoom from "../../stomp/chat/useChattingRoom";
 import { useRecoilValue } from "recoil";
 import { questionsState } from "../../recoil/chat-atoms";
 import useRoom from "../../api/room/useRoom";
+import { useNavigate, useParams } from "react-router-dom";
 
 const CLOUD_WIDTH = 200;
 const CLOUD_HEIGHT = 150;
@@ -18,6 +19,9 @@ const ChattingRoomPage = () => {
   const cloudPositionsRef = useRef({});
   const { getQuestions, getGuests } = useRoom();
   const dataFetchedRef = useRef(false);
+  const positionsCalculatedRef = useRef(false);
+  const navigate = useNavigate();
+  const { uuid } = useParams();
 
   const updateViewportSize = useCallback(() => {
     setViewportSize({
@@ -27,12 +31,21 @@ const ChattingRoomPage = () => {
   }, []);
 
   useEffect(() => {
-    if (roomId && !dataFetchedRef.current) {
-      getQuestions(roomId);
-      getGuests(roomId);
-      dataFetchedRef.current = true;
-    }
-  }, [roomId, getQuestions, getGuests]);
+    const fetchData = async () => {
+      if (roomId && !dataFetchedRef.current) {
+        try {
+          await getQuestions(roomId);
+          await getGuests(roomId);
+          dataFetchedRef.current = true;
+        } catch (error) {
+          console.error("Error fetching data:", error);
+          navigate(`/${uuid}/customize`);
+        }
+      }
+    };
+
+    fetchData();
+  }, [roomId, getQuestions, getGuests, navigate, uuid]);
 
   useEffect(() => {
     updateViewportSize();
@@ -41,51 +54,31 @@ const ChattingRoomPage = () => {
   }, [updateViewportSize]);
 
   const getRandomPosition = useCallback(
-    (existingPositions) => {
+    (index, totalQuestions) => {
       const padding = 30;
-      let attempts = 0;
-      const maxAttempts = 100;
+      const spawnAreaHeight = viewportSize.height * 0.8; // 화면 높이의 40%를 사용
+      const bottomAreaStart = viewportSize.height * 0.1; // 화면 높이의 60%부터 시작
 
-      const bottomAreaStart = viewportSize.height * 0.75;
-      const bottomAreaHeight = viewportSize.height * 0.25;
+      const x =
+        Math.random() * (viewportSize.width - CLOUD_WIDTH - padding * 2) +
+        padding;
+      const y = bottomAreaStart + (index / totalQuestions) * spawnAreaHeight;
 
-      while (attempts < maxAttempts) {
-        const x =
-          Math.random() * (viewportSize.width - CLOUD_WIDTH - padding * 2) +
-          padding;
-        const y =
-          bottomAreaStart +
-          Math.random() * (bottomAreaHeight - CLOUD_HEIGHT - padding);
-
-        const overlap = existingPositions.some(
-          (pos) =>
-            Math.abs(pos.x - x) < CLOUD_WIDTH &&
-            Math.abs(pos.y - y) < CLOUD_HEIGHT
-        );
-
-        if (!overlap) {
-          return { x, y };
-        }
-
-        attempts++;
-      }
-
-      return {
-        x: Math.random() * (viewportSize.width - CLOUD_WIDTH),
-        y: bottomAreaStart + Math.random() * (bottomAreaHeight - CLOUD_HEIGHT),
-      };
+      return { x, y };
     },
     [viewportSize.width, viewportSize.height]
   );
 
   useEffect(() => {
-    questions.forEach((question) => {
-      if (!cloudPositionsRef.current[question.questionId]) {
-        const existingPositions = Object.values(cloudPositionsRef.current);
-        const position = getRandomPosition(existingPositions);
-        cloudPositionsRef.current[question.questionId] = position;
-      }
-    });
+    if (!positionsCalculatedRef.current && questions.length > 0) {
+      questions.forEach((question, index) => {
+        if (!cloudPositionsRef.current[question.questionId]) {
+          const position = getRandomPosition(index, questions.length);
+          cloudPositionsRef.current[question.questionId] = position;
+        }
+      });
+      positionsCalculatedRef.current = true;
+    }
   }, [questions, getRandomPosition]);
 
   return (
