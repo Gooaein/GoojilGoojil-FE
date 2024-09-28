@@ -8,22 +8,32 @@ import { questionsState } from "../../recoil/chat-atoms";
 import useRoom from "../../api/room/useRoom";
 import { useNavigate, useParams } from "react-router-dom";
 
-const CHATTING_INPUT_HEIGHT = 100;
-const PADDING = 20;
-const GRID_SIZE = 50;
-
 const ChattingRoomPage = () => {
   const roomId = localStorage.getItem("roomId");
   const { handleSendLike } = useChattingRoom(roomId, true);
   const questions = useRecoilValue(questionsState);
   const [cloudPositions, setCloudPositions] = useState({});
-  const gridRef = useRef({});
-  const positionsCalculatedRef = useRef(false);
 
   const { getGuests, getQuestions } = useRoom();
   const dataFetchedRef = useRef(false);
   const navigate = useNavigate();
   const { uuid } = useParams();
+
+  const containerRef = useRef(null);
+
+  const generateRandomPosition = useCallback((questionId) => {
+    if (containerRef.current) {
+      const containerWidth = containerRef.current.offsetWidth;
+      const containerHeight = containerRef.current.offsetHeight;
+      const cloudSize = 200; // 예상되는 구름의 최대 크기
+
+      return {
+        x: Math.random() * (containerWidth - cloudSize),
+        y: Math.random() * (containerHeight - cloudSize),
+      };
+    }
+    return { x: 0, y: 0 };
+  }, []);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -42,83 +52,23 @@ const ChattingRoomPage = () => {
     fetchData();
   }, [roomId, getQuestions, getGuests, navigate, uuid]);
 
-  const initializeGrid = useCallback(() => {
-    const maxWidth = Math.floor((window.innerWidth - PADDING * 2) / GRID_SIZE);
-    const maxHeight = Math.floor(
-      (window.innerHeight - CHATTING_INPUT_HEIGHT - PADDING * 2) / GRID_SIZE
-    );
-
-    gridRef.current = Array(maxHeight)
-      .fill()
-      .map(() => Array(maxWidth).fill(false));
-  }, []);
-
-  const getRandomPosition = useCallback(() => {
-    const maxWidth = gridRef.current[0].length;
-    const maxHeight = gridRef.current.length;
-
-    const availableCells = [];
-    for (let y = 0; y < maxHeight; y++) {
-      for (let x = 0; x < maxWidth; x++) {
-        if (!gridRef.current[y][x]) {
-          availableCells.push({ x, y });
-        }
-      }
-    }
-
-    if (availableCells.length === 0) return null;
-
-    // Randomly select a cell from available cells
-    const randomCell =
-      availableCells[Math.floor(Math.random() * availableCells.length)];
-    gridRef.current[randomCell.y][randomCell.x] = true;
-
-    return {
-      x: randomCell.x * GRID_SIZE + PADDING,
-      y: randomCell.y * GRID_SIZE + PADDING,
-    };
-  }, []);
-
-  const updateCloudPositions = useCallback(() => {
-    if (positionsCalculatedRef.current) return;
-
-    initializeGrid();
+  useEffect(() => {
     const newPositions = {};
-
-    // Shuffle questions to assign random positions
-    const shuffledQuestions = [...questions].sort(() => Math.random() - 0.5);
-
-    shuffledQuestions.forEach((question) => {
-      const position = getRandomPosition();
-      if (position) {
-        newPositions[question.questionId] = position;
+    questions.forEach((question) => {
+      if (!cloudPositions[question.questionId]) {
+        newPositions[question.questionId] = generateRandomPosition(
+          question.questionId
+        );
+      } else {
+        newPositions[question.questionId] = cloudPositions[question.questionId];
       }
     });
-
     setCloudPositions(newPositions);
-    positionsCalculatedRef.current = true;
-  }, [questions, getRandomPosition, initializeGrid]);
-
-  useEffect(() => {
-    if (!positionsCalculatedRef.current) {
-      updateCloudPositions();
-    }
-  }, [updateCloudPositions, questions]);
-
-  useEffect(() => {
-    const handleResize = () => {
-      if (!positionsCalculatedRef.current) {
-        updateCloudPositions(); // Recalculate positions if they haven't been calculated yet
-      }
-    };
-
-    window.addEventListener("resize", handleResize);
-    return () => window.removeEventListener("resize", handleResize);
-  }, [updateCloudPositions]);
+  }, [questions, generateRandomPosition, cloudPositions]);
 
   return (
     <div className={styles.container}>
-      <div className={styles.cloudContainer}>
+      <div ref={containerRef} className={styles.cloudContainer}>
         {questions.map((question) => (
           <QuestionCloud
             key={question.questionId}
