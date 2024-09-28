@@ -5,6 +5,8 @@ import heartImage from "./heart.png";
 import { useRecoilValue } from "recoil";
 import { roomDetailState } from "../../recoil/room-atoms";
 import useRoom from "../../api/room/useRoom";
+import notificationSound from "../../assets/sound/goojilgoojil_sound.mp3";
+import useSound from "use-sound";
 
 const SpeakerRoomPage = () => {
   const roomId = localStorage.getItem("roomId");
@@ -12,6 +14,7 @@ const SpeakerRoomPage = () => {
   const [persistentQuestions, setPersistentQuestions] = useState([]);
   const roomDetail = useRecoilValue(roomDetailState);
   const { getRoomDetail } = useRoom();
+  const [play] = useSound(notificationSound);
 
   useEffect(() => {
     const fetchRoomDetail = async () => {
@@ -55,12 +58,15 @@ const SpeakerRoomPage = () => {
           content,
           likeCount,
         }));
-
+      // 새로운 질문이 추가되었을 때 소리 재생
+      if (newQuestions.length > 0) {
+        play();
+      }
       return [...updatedQuestions, ...newQuestions].sort(
         (a, b) => b.likeCount - a.likeCount
       );
     });
-  }, [sortedQuestions, questions]);
+  }, [sortedQuestions, questions, play]);
 
   const handleConfirm = (questionId) => {
     console.log("Question confirmed:", questionId);
