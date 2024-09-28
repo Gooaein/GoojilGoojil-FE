@@ -4,11 +4,11 @@ import Cookies from "js-cookie";
 export const applyInterceptors = (instance) => {
   instance.interceptors.request.use(
     async (config) => {
-      const token = Cookies.get("accessToken"); // 'accessToken'은 여러분의 토큰 쿠키 이름입니다
+      const token = Cookies.get("access_token"); // 'accessToken'은 여러분의 토큰 쿠키 이름입니다
       if (token) {
         config.headers["Authorization"] = `Bearer ${token}`;
-        console.log(token);
       } else {
+        window.location.href = `/login`;
         // enqueueSnackbar(
         //     `☺️1초 만에 로그인 가능하게 만들어뒀어요!`,
         // );
