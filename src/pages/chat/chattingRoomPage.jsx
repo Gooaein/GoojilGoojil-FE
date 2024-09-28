@@ -63,7 +63,7 @@ const ChattingRoomPage = () => {
     const y = Math.random() * availableHeight + PADDING;
 
     return { x, y };
-  }, [viewportSize]);
+  }, [viewportSize.width, viewportSize.height]);
 
   const checkOverlap = useCallback((position, existingPositions) => {
     return existingPositions.some(
@@ -74,30 +74,32 @@ const ChattingRoomPage = () => {
   }, []);
 
   useEffect(() => {
-    const newPositions = { ...cloudPositions };
-    const existingPositions = Object.values(newPositions);
+    setCloudPositions((prevPositions) => {
+      const newPositions = { ...prevPositions };
+      const existingPositions = Object.values(newPositions);
 
-    questions.forEach((question) => {
-      if (!newPositions[question.questionId]) {
-        let position;
-        let attempts = 0;
-        const maxAttempts = 50;
+      questions.forEach((question) => {
+        if (!newPositions[question.questionId]) {
+          let position;
+          let attempts = 0;
+          const maxAttempts = 50;
 
-        do {
-          position = getRandomPosition();
-          attempts++;
-        } while (
-          checkOverlap(position, existingPositions) &&
-          attempts < maxAttempts
-        );
+          do {
+            position = getRandomPosition();
+            attempts++;
+          } while (
+            checkOverlap(position, existingPositions) &&
+            attempts < maxAttempts
+          );
 
-        newPositions[question.questionId] = position;
-        existingPositions.push(position);
-      }
+          newPositions[question.questionId] = position;
+          existingPositions.push(position);
+        }
+      });
+
+      return newPositions;
     });
-
-    setCloudPositions(newPositions);
-  }, [questions, getRandomPosition, checkOverlap, cloudPositions]);
+  }, [questions, getRandomPosition, checkOverlap]);
 
   return (
     <div className={styles.container}>
