@@ -14,9 +14,7 @@ import { questionsState } from "../../recoil/chat-atoms";
 import { useNavigate, useParams } from "react-router-dom";
 import useRoom from "../../api/room/useRoom";
 
-const CLOUD_WIDTH = 150;
-const CLOUD_HEIGHT = 100;
-const MIN_DISTANCE = Math.sqrt(CLOUD_WIDTH ** 2 + CLOUD_HEIGHT ** 2);
+const GRID_SIZE = 200; // 그리드 셀의 크기
 
 const ChattingRoomPage = () => {
   const { getGuests, getQuestions } = useRoom();
@@ -29,6 +27,7 @@ const ChattingRoomPage = () => {
   const questions = useRecoilValue(questionsState);
   const [viewportSize, setViewportSize] = useState({ width: 0, height: 0 });
   const cloudPositionsRef = useRef({});
+  const gridRef = useRef([]);
 
   const updateViewportSize = useCallback(() => {
     setViewportSize({
@@ -43,55 +42,54 @@ const ChattingRoomPage = () => {
     return () => window.removeEventListener("resize", updateViewportSize);
   }, [updateViewportSize]);
 
-  const getRandomPosition = useCallback(() => {
-    const padding = 20;
-    const x =
-      Math.random() * (viewportSize.width - CLOUD_WIDTH - padding * 2) +
-      padding;
-    const y =
-      Math.random() * (viewportSize.height - CLOUD_HEIGHT - padding * 2) +
-      padding;
-    return { x, y };
-  }, [viewportSize.width, viewportSize.height]);
+  const initializeGrid = useCallback(() => {
+    const columns = Math.floor(viewportSize.width / GRID_SIZE);
+    const rows = Math.floor(viewportSize.height / GRID_SIZE);
+    gridRef.current = Array(rows)
+      .fill()
+      .map(() => Array(columns).fill(false));
+  }, [viewportSize]);
 
-  const isPositionValid = useCallback((newPos, existingPositions) => {
-    return !existingPositions.some((pos) => {
-      const distance = Math.sqrt(
-        (newPos.x - pos.x) ** 2 + (newPos.y - pos.y) ** 2
-      );
-      return distance < MIN_DISTANCE;
-    });
+  const findAvailableCell = useCallback(() => {
+    const rows = gridRef.current.length;
+    const columns = gridRef.current[0].length;
+
+    for (let i = 0; i < rows; i++) {
+      for (let j = 0; j < columns; j++) {
+        if (!gridRef.current[i][j]) {
+          return { row: i, col: j };
+        }
+      }
+    }
+    return null;
   }, []);
 
-  const findValidPosition = useCallback(
-    (existingPositions) => {
-      let newPos;
-      let attempts = 0;
-      const maxAttempts = 100;
-
-      do {
-        newPos = getRandomPosition();
-        attempts++;
-      } while (
-        !isPositionValid(newPos, existingPositions) &&
-        attempts < maxAttempts
-      );
-
-      return newPos;
+  const positionCloud = useCallback(
+    (questionId) => {
+      const cell = findAvailableCell();
+      if (cell) {
+        const { row, col } = cell;
+        gridRef.current[row][col] = true;
+        cloudPositionsRef.current[questionId] = {
+          x: col * GRID_SIZE,
+          y: row * GRID_SIZE,
+        };
+      }
     },
-    [getRandomPosition, isPositionValid]
+    [findAvailableCell]
   );
 
   useEffect(() => {
-    const positionsArray = Object.values(cloudPositionsRef.current);
+    initializeGrid();
+    Object.keys(cloudPositionsRef.current).forEach((id) => {
+      positionCloud(id);
+    });
     questions.forEach((question) => {
       if (!cloudPositionsRef.current[question.questionId]) {
-        const newPosition = findValidPosition(positionsArray);
-        cloudPositionsRef.current[question.questionId] = newPosition;
-        positionsArray.push(newPosition);
+        positionCloud(question.questionId);
       }
     });
-  }, [questions, findValidPosition]);
+  }, [questions, initializeGrid, positionCloud]);
 
   useEffect(() => {
     const fetchData = async () => {

@@ -5,6 +5,7 @@ import chatCloudImage from "../../../assets/images/chat/chatCloudImage.png";
 import Portal from "../../common/Portal";
 import { useLottie } from "lottie-react";
 import animationData from "../../../assets/animation/rain.json";
+
 const getOpacity = (remainingTime) => {
   if (typeof remainingTime !== "number" || isNaN(remainingTime)) {
     return 0.3;
@@ -18,9 +19,9 @@ const getOpacity = (remainingTime) => {
 };
 
 const getCloudSize = (likeCount) => {
-  const baseSize = 200; // 기본 크기 (px)
-  const maxSize = 500; // 최대 크기 (px)
-  const growthFactor = 0; // 좋아요 1개당 증가하는 크기 (px)
+  const baseSize = 150; // 기본 크기 (px)
+  const maxSize = 300; // 최대 크기 (px)
+  const growthFactor = 10; // 좋아요 1개당 증가하는 크기 (px)
 
   const size = baseSize + likeCount * growthFactor;
   return Math.min(size, maxSize);
@@ -45,6 +46,7 @@ export const QuestionCloud = React.memo(
         display: "flex",
         alignItems: "center",
         justifyContent: "center",
+        transition: "all 0.3s ease-in-out",
       };
     }, [question.remainingTime, question.likeCount, style]);
 
@@ -88,7 +90,7 @@ export const QuestionCloud = React.memo(
 
     useEffect(() => {
       if (showAnimation) {
-        const timer = setTimeout(handleAnimationComplete, 3000); // 애니메이션 지속 시간
+        const timer = setTimeout(handleAnimationComplete, 3000);
         return () => clearTimeout(timer);
       }
     }, [showAnimation, handleAnimationComplete]);
