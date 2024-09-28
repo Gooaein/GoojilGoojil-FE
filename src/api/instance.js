@@ -14,12 +14,12 @@ const exampleInstance = axios.create(defaultInstance.defaults);
 exampleInstance.defaults.baseURL += "/example";
 
 const roomsInstance = axios.create({
-  baseURL: `${BASE_URL}/api/v1/rooms/`,
+  baseURL: `${BASE_URL}/api/v1/rooms`,
 });
 
 //userRoomsInstance 로 Interceptor를 적용한다.
 const userRoomsIntance = axios.create({
-  baseURL: `${BASE_URL}/api/v1/users/rooms/`,
+  baseURL: `${BASE_URL}/api/v1/users/rooms`,
 });
 
 //oauth2/authorization/kakao 경로를 위한 인스턴스
