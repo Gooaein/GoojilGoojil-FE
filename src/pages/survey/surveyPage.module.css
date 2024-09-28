@@ -1,0 +1,142 @@
+body {
+  margin: 0;
+  padding: 0;
+  background-color: white;
+  font-family: "Arial", sans-serif;
+  overflow-x: hidden; /* 가로 스크롤 방지 */
+}
+
+.star {
+  width: 16px;
+  height: 16px;
+  display: inline-block;
+}
+
+.header {
+  border-bottom: 1px solid #d5d5d7; /* 상단바 아래 경계선 */
+}
+
+.divider {
+  width: 1920px; /* 가로선 폭 */
+  height: 1px; /* 가로선 높이 */
+  background-color: #d5d5d7; /* 가로선 색상 */
+  margin-top: 15px; /* 선과 제목 간의 간격 */
+  margin-bottom: 15px;
+}
+
+.titleContainer {
+  margin-top: 50px;
+  margin-left: 300px;
+  display: flex;
+  align-items: center;
+  justify-content: left; /* 중앙 정렬 */
+  width: 100%; /* 가로 폭 전체 */
+}
+
+.seminarTitle {
+  font-size: 28px; /* 제목 크기 */
+  font-weight: bold; /* 볼드체 */
+  margin-right: 20px; /* 제목과 응답 인원 간의 간격 */
+}
+
+.currentRespondents {
+  font-size: 16px; /* 응답 인원 텍스트 크기 */
+  color: #767676; /* 회색 */
+}
+
+.content {
+  padding: 40px 20px;
+  text-align: center;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+table {
+  margin: 20px auto;
+  border-collapse: collapse;
+  width: 100%; /* 테이블 너비를 100%로 설정 */
+  max-width: 1200px;
+}
+
+th,
+td {
+  padding: 10px 20px;
+  text-align: left;
+  font-size: 16px;
+}
+
+th {
+  font-weight: bold;
+  border-bottom: 2px solid #ddd;
+}
+
+td {
+  vertical-align: middle;
+}
+
+/* surveyPage.module.css */
+
+.bigRatingContainer {
+  display: flex; /* 플렉스 박스로 설정 */
+  flex-direction: column; /* 세로 정렬 */
+  align-items: center; /* 가로 중앙 정렬 */
+  margin-top: 40px; /* 위쪽 여백 */
+}
+
+.bigRating {
+  font-size: 36px; /* 별과 숫자 크기 증가 */
+  font-weight: bold;
+  margin-top: 20px;
+  color: black;
+  display: flex; /* 플렉스 박스로 설정하여 정렬 */
+  align-items: center; /* 세로 중앙 정렬 */
+}
+
+.bigStar {
+  width: 22px; /* 큰 별 이미지 크기 */
+  height: 22px; /* 큰 별 이미지 크기 */
+  margin-right: 5px; /* 숫자와의 간격 추가 */
+}
+
+.maxRating {
+  font-size: 14px; /* 최대 평점 크기 */
+  color: #767676; /* 회색 */
+}
+
+.back-button {
+  margin-top: 40px;
+  padding: 10px 20px;
+  background-color: #717fff;
+  color: #ffffff;
+  border: 1px solid #5a5dbb;
+  border-radius: 45px;
+  cursor: pointer;
+  font-size: 16px; /* 버튼 텍스트 크기 추가 */
+}
+
+.back-button:hover {
+  background-color: #5a61db;
+}
+
+/* surveyPage.module.css */
+.button {
+  background-color: #717fff; /* 버튼 배경색 */
+  color: #ffffff; /* 버튼 글자색 */
+  padding: 0.7rem 1.5rem; /* 버튼 패딩 */
+  border-radius: 9999px; /* 둥근 모서리 */
+  border: none; /* 테두리 없음 */
+  cursor: pointer; /* 마우스 커서 포인터로 변경 */
+  font-weight: bold; /* 글씨 굵게 */
+  font-size: 15px; /* 글씨 크기 */
+  transition: all 0.3s ease; /* 부드러운 전환 효과 */
+  margin-top: 20px;
+}
+
+.button:hover {
+  background-color: #8b5cf6; /* 호버 시 배경색 */
+  color: white; /* 호버 시 글자색 */
+}
+
+.grayText {
+  color: #767676; /* 회색 텍스트 */
+}

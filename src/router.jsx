@@ -5,6 +5,8 @@ import NotFoundPage from "./pages/error/notFoundPage";
 import CustomizingPage from "./pages/customize/customizingPage";
 import { Header } from "./components/common/Header/Header";
 import ChattingRoomPage from "./pages/chat/chattingRoomPage";
+import SurveyPage from "./pages/survey/surveyPage";
+import LoginPage from "./pages/login/loginPage";
 import CreateRoomPage from "./pages/createRoom/createRoomPage";
 import RoomListPage from "./pages/list/roomListPage";
 import SpeakerRoomPage from "./pages/speakerRoom/speakerRoomPage";
@@ -14,6 +16,10 @@ const AppRouter = () => (
     <Header />
     <Routes>
       <Route path="/" element={<IntroPage />} />
+      <Route path="/chattingRoom" element={<ChattingRoomPage />} />
+      <Route path="/customize" element={<CustomizingPage />} />
+      <Route path="/survey" element={<SurveyPage />} />
+      <Route path="/login" element={<LoginPage />} />
       <Route path="/:uuid/chattingRoom" element={<ChattingRoomPage />} />
       <Route path="/:uuid/customize" element={<CustomizingPage />} />
       <Route path="/createRoom" element={<CreateRoomPage />} />
