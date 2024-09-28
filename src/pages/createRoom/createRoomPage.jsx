@@ -13,7 +13,7 @@ const CreateRoom = () => {
 
   // 입력 필드들의 상태 관리
   const [roomName, setRoomName] = useState("");
-  const [lectureDate, setLectureDate] = useState("");
+  const [lectureDate, setLectureDate] = useState(new Date());
   const [lecturePlace, setLecturePlace] = useState("");
 
   // 임시로 like_threshold 값 설정 (실제 구현에서는 이 값을 적절히 설정해야 함)
