@@ -28,7 +28,7 @@ export const useRoom = () => {
 
   const sendAvatar = async (avatar_base64, uuid) => {
     try {
-      const data = await roomAPI.sendAvatar(avatar_base64, uuid);
+      const data = await sendAvatar(avatar_base64, uuid);
       setAvatar(data);
     } catch (error) {
       console.error("Failed to send avatar:", error);

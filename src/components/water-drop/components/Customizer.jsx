@@ -4,8 +4,9 @@ import { featureOptions } from "../../../constants/waterDropContent";
 import { useRecoilState } from "recoil";
 import { characterState } from "../../../recoil/character-atoms";
 import { createCompositeImage } from "../../../util/createCompositeImage";
-import { sendAvatar } from "../../../api/room/room";
+
 import { useNavigate, useParams } from "react-router-dom";
+import { sendAvatar } from "../../../api/room/avatar";
 export const Customizer = () => {
   const [character, setCharacter] = useRecoilState(characterState);
   const navigate = useNavigate();

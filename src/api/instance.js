@@ -1,5 +1,5 @@
 import axios from "axios";
-import { config } from "../config/config";
+import { applyInterceptors } from "./interceptor";
 
 //.env로 숨긴 url 주소 (backend 주소 <-> front 주소)
 const BASE_URL = process.env.REACT_APP_BACKEND_SERVER_URL;
@@ -13,17 +13,27 @@ const defaultInstance = axios.create({
 const exampleInstance = axios.create(defaultInstance.defaults);
 exampleInstance.defaults.baseURL += "/example";
 
-// '/api/v1/rooms' 경로를 위한 인스턴스
 const roomsInstance = axios.create({
-  baseURL: `${BASE_URL}/api/v1/rooms`,
-  withCredentials: config.withCredentials,
+  baseURL: `${BASE_URL}/api/v1/rooms/`,
 });
 
-// '/api/v1/rooms' 경로를 위한 인스턴스
+//userRoomsInstance 로 Interceptor를 적용한다.
+const userRoomsIntance = axios.create({
+  baseURL: `${BASE_URL}/api/v1/users/rooms/`,
+});
+
+//oauth2/authorization/kakao 경로를 위한 인스턴스
 const oauth2 = axios.create({
   baseURL: `${BASE_URL}/oauth2/authorization/kakao
   `,
 });
-// applyInterceptors(exampleInstance);
 
-export { defaultInstance, exampleInstance, roomsInstance, oauth2 };
+applyInterceptors(userRoomsIntance);
+
+export {
+  defaultInstance,
+  exampleInstance,
+  oauth2,
+  userRoomsIntance,
+  roomsInstance,
+};
