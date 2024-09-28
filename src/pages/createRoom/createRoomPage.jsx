@@ -44,7 +44,7 @@ const CreateRoom = () => {
         likeThreshold
       );
 
-      const generatedUrl = `https://goojilgoojil.com/${urlUUID}`;
+      const generatedUrl = `https://goojilgoojil.com/${urlUUID}/customize`;
       setRoomUrl(generatedUrl);
       setModalOpen(true);
     } catch (error) {
