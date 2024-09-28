@@ -12,9 +12,14 @@ export const Header = () => {
   const user = useRecoilValue(userState);
   const activeUsers = useRecoilValue(activeUsersState);
   const [showActiveUsers, setShowActiveUsers] = useState(false);
+  const [showMobileMenu, setShowMobileMenu] = useState(false);
 
   const toggleActiveUsers = () => {
     setShowActiveUsers(!showActiveUsers);
+  };
+
+  const toggleMobileMenu = () => {
+    setShowMobileMenu(!showMobileMenu);
   };
 
   const handleExternalLink = (url) => {
@@ -46,7 +51,17 @@ export const Header = () => {
               <img src={HeaderLogo} alt="로고" className={styles.logo} />
             </Link>
           </div>
-          <nav>
+          <div className={styles.mobileActions}>
+            <button onClick={toggleActiveUsers} className={styles.mobileButton}>
+              👤
+            </button>
+            <button onClick={toggleMobileMenu} className={styles.mobileButton}>
+              ☰
+            </button>
+          </div>
+          <nav
+            className={`${styles.nav} ${showMobileMenu ? styles.showMobileMenu : ""}`}
+          >
             <ul className={styles.navList}>
               {navItems.map((item) => (
                 <li key={item.name}>
@@ -66,7 +81,7 @@ export const Header = () => {
                   )}
                 </li>
               ))}
-              <li>
+              <li className={styles.desktopOnly}>
                 <button onClick={toggleActiveUsers} className={styles.navItem}>
                   <Users className={styles.icon} size={18} />
                   활성 사용자 ({activeUsers.length})
@@ -75,7 +90,9 @@ export const Header = () => {
             </ul>
           </nav>
           {user && (
-            <span className={styles.userName}>환영합니다, {user.name}님</span>
+            <span className={`${styles.userName} ${styles.desktopOnly}`}>
+              환영합니다, {user.name}님
+            </span>
           )}
         </div>
       </header>

@@ -53,7 +53,7 @@ export const ChattingInput = () => {
             questionInput.onKeyPress(e);
           }
         }}
-        placeholder="제목 : 내용 순으로 입력하시면 됩니다!!"
+        placeholder="제목 : 내용 순으로 입력하시면 됩니다!!     ex) 혹시 구름톤이 뭐예요? : 진짜 몰라서 물어보는 거예요"
         rows={1}
       />
       <button

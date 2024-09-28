@@ -1,0 +1,58 @@
+.fullPageContainer {
+  position: relative;
+  width: 100vw;
+  height: 500vh;
+  overflow: hidden;
+}
+
+.fullPageImage {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center;
+}
+
+.imageOverlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  color: white;
+  text-align: center;
+  padding: 1rem;
+}
+
+.overlayText {
+  font-size: 2.5rem;
+  margin-bottom: 1rem;
+}
+
+.overlaySubtext {
+  font-size: 1.2rem;
+}
+
+@media (min-width: 768px) {
+  .overlayText {
+    font-size: 3.5rem;
+  }
+
+  .overlaySubtext {
+    font-size: 1.5rem;
+  }
+}
+
+@media (min-width: 1024px) {
+  .overlayText {
+    font-size: 4.5rem;
+  }
+
+  .overlaySubtext {
+    font-size: 1.8rem;
+  }
+}

@@ -10,6 +10,7 @@ import LoginPage from "./pages/login/loginPage";
 import CreateRoomPage from "./pages/createRoom/createRoomPage";
 import RoomListPage from "./pages/list/roomListPage";
 import { StompProvider } from "./context/StompContext";
+import IntroducePage from "./pages/introduce/introduce";
 
 const StompWrappedChattingRoom = () => (
   <StompProvider>
@@ -39,6 +40,7 @@ const AppRouter = () => (
       />
       <Route path="/:uuid/customize" element={<CustomizingPage />} />
       <Route path="/createRoom" element={<CreateRoomPage />} />
+      <Route path="/introduce" element={<IntroducePage />} />
       <Route path="/list" element={<RoomListPage />} />
       <Route path="*" element={<NotFoundPage />} />
     </Routes>

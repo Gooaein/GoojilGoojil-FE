@@ -54,3 +54,33 @@
   left: 50%;
   transform: translateX(-50%);
 }
+
+/* 미디어 쿼리 추가 */
+@media (max-width: 768px) {
+  .container {
+    max-width: 300px;
+  }
+}
+
+@media (max-width: 480px) {
+  .container {
+    max-width: 160px;
+    max-height: 300px;
+  }
+
+  .eyes {
+    width: 110px;
+    height: 70px;
+    top: 30%;
+    left: 50%;
+    transform: translateX(-50%);
+  }
+
+  .mouth {
+    width: 40px;
+    height: 20px;
+    top: 60%;
+    left: 50%;
+    transform: translateX(-50%);
+  }
+}

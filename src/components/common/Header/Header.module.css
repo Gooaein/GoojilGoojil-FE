@@ -1,33 +1,17 @@
-a {
-  text-decoration: none;
-  color: inherit;
-}
-ul {
-  list-style-type: none;
-}
 .header {
+  width: 90%;
   background-color: #ffffff00;
-  padding: 1rem;
   position: relative;
   z-index: 10;
-}
-
-:global(.active-users-container) {
-  position: absolute;
-  top: 100%;
-  left: 0;
-  right: 0;
-  background-color: #f8f9fa;
-  border-top: 1px solid #e9ecef;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-  z-index: 5;
+  margin: 0 auto;
 }
 
 .container {
-  margin: 0 auto;
+  padding: 1rem;
+  width: 90%;
   display: flex;
-  align-items: center;
   justify-content: space-between;
+  align-items: center;
 }
 
 .logoContainer {
@@ -36,38 +20,109 @@ ul {
 }
 
 .logo {
-  width: 200px;
-  margin-right: 1rem;
+  width: 8rem;
 }
 
-.companyName {
-  font-size: 1.25rem;
-  font-weight: bold;
+.mobileActions {
+  display: none;
+}
+
+.nav {
+  display: block;
 }
 
 .navList {
+  list-style-type: none;
+  padding: 0;
+  margin: 0;
   display: flex;
-  gap: 1rem;
+  align-items: center;
 }
 
 .navItem {
   display: flex;
   align-items: center;
   color: #4b5563;
+  padding: 0.75rem 1rem;
+  text-decoration: none;
+  background: none;
   border: none;
-  transition: color 0.2s;
-  background-color: #ffffff;
+  transition: background-color 0.2s;
 }
 
 .navItem:hover {
-  color: #3b82f6;
+  background-color: #e9ecef;
 }
 
 .icon {
-  margin-right: 0.25rem;
+  margin-right: 0.5rem;
 }
 
 .userName {
-  margin-left: 1rem;
+  display: block;
   font-weight: 500;
+  margin-left: 1rem;
+}
+
+.desktopOnly {
+  display: block;
+}
+
+.desktopOnly button {
+  background: none;
+  border: none;
+}
+
+@media (max-width: 768px) {
+  .mobileActions {
+    display: flex;
+    align-items: center;
+  }
+
+  .mobileButton {
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 0.5rem;
+    margin-left: 0.5rem;
+    font-size: 1.5rem; /* 이모지 크기 조절 */
+  }
+
+  .nav {
+    display: none;
+  }
+
+  .navList {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .navItem {
+    width: 100%;
+  }
+
+  .userName {
+    display: none;
+  }
+
+  .showMobileMenu {
+    display: block;
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    background-color: #f8f9fa;
+    border-top: 1px solid #e9ecef;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  }
+}
+
+@media (min-width: 1024px) {
+  .logo {
+    width: 10rem;
+  }
+
+  .navList {
+    gap: 1rem;
+  }
 }
