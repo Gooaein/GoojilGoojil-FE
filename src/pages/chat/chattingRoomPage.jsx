@@ -8,9 +8,6 @@ import { questionsState } from "../../recoil/chat-atoms";
 import useRoom from "../../api/room/useRoom";
 import { useNavigate, useParams } from "react-router-dom";
 
-const CLOUD_WIDTH = 200;
-const CLOUD_HEIGHT = 150;
-
 const ChattingRoomPage = () => {
   const roomId = localStorage.getItem("roomId");
   const { handleSendLike } = useChattingRoom(roomId, true);
@@ -53,14 +50,23 @@ const ChattingRoomPage = () => {
     return () => window.removeEventListener("resize", updateViewportSize);
   }, [updateViewportSize]);
 
+  const getCloudSize = useCallback((likeCount) => {
+    const baseSize = 200;
+    const maxSize = 500;
+    const growthFactor = 40;
+
+    const size = baseSize + likeCount * growthFactor;
+    return Math.min(size, maxSize);
+  }, []);
+
   const getRandomPosition = useCallback(
-    (index, totalQuestions) => {
+    (index, totalQuestions, cloudSize) => {
       const padding = 30;
-      const spawnAreaHeight = viewportSize.height * 0.8; // 화면 높이의 40%를 사용
-      const bottomAreaStart = viewportSize.height * 0.1; // 화면 높이의 60%부터 시작
+      const spawnAreaHeight = viewportSize.height * 0.8;
+      const bottomAreaStart = viewportSize.height * 0.1;
 
       const x =
-        Math.random() * (viewportSize.width - CLOUD_WIDTH - padding * 2) +
+        Math.random() * (viewportSize.width - cloudSize - padding * 2) +
         padding;
       const y = bottomAreaStart + (index / totalQuestions) * spawnAreaHeight;
 
@@ -73,31 +79,41 @@ const ChattingRoomPage = () => {
     if (!positionsCalculatedRef.current && questions.length > 0) {
       questions.forEach((question, index) => {
         if (!cloudPositionsRef.current[question.questionId]) {
-          const position = getRandomPosition(index, questions.length);
-          cloudPositionsRef.current[question.questionId] = position;
+          const cloudSize = getCloudSize(question.likeCount);
+          const position = getRandomPosition(
+            index,
+            questions.length,
+            cloudSize
+          );
+          cloudPositionsRef.current[question.questionId] = {
+            ...position,
+            size: cloudSize,
+          };
         }
       });
       positionsCalculatedRef.current = true;
     }
-  }, [questions, getRandomPosition]);
+  }, [questions, getRandomPosition, getCloudSize]);
 
   return (
     <div className={styles.container}>
       <div className={styles.cloudContainer}>
-        {questions.map((question) => (
-          <QuestionCloud
-            key={question.questionId}
-            question={question}
-            handleSendLike={handleSendLike}
-            style={{
-              position: "absolute",
-              left: `${cloudPositionsRef.current[question.questionId]?.x}px`,
-              top: `${cloudPositionsRef.current[question.questionId]?.y}px`,
-              width: `${CLOUD_WIDTH}px`,
-              height: `${CLOUD_HEIGHT}px`,
-            }}
-          />
-        ))}
+        {questions.map((question) => {
+          const cloudInfo = cloudPositionsRef.current[question.questionId];
+          return (
+            <QuestionCloud
+              key={question.questionId}
+              question={question}
+              handleSendLike={handleSendLike}
+              style={{
+                left: `${cloudInfo?.x}px`,
+                top: `${cloudInfo?.y}px`,
+                width: `${cloudInfo?.size}px`,
+                height: `${cloudInfo?.size}px`,
+              }}
+            />
+          );
+        })}
       </div>
       <ChattingInput />
     </div>
