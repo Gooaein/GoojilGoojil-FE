@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useCallback } from "react";
+import React, { useEffect, useState, useMemo } from "react";
 import styles from "./speakerRoomPage.module.css";
 import useChattingRoom from "../../stomp/chat/useChattingRoom";
 import heartImage from "./heart.png";
@@ -9,7 +9,7 @@ import useRoom from "../../api/room/useRoom";
 const SpeakerRoomPage = () => {
   const roomId = localStorage.getItem("roomId");
   const { questions, isConnected } = useChattingRoom(roomId, true);
-  const [sortedQuestions, setSortedQuestions] = useState([]);
+  const [persistentQuestions, setPersistentQuestions] = useState([]);
   const roomDetail = useRecoilValue(roomDetailState);
   const { getRoomDetail } = useRoom();
 
@@ -25,22 +25,27 @@ const SpeakerRoomPage = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [roomId]);
 
-  const filterAndSortQuestions = useCallback(() => {
-    const filtered = questions.filter(
-      (q) => q.likeCount >= (roomDetail?.like_threshold || 0)
-    );
-    const sorted = filtered.sort((a, b) => b.likeCount - a.likeCount);
-    setSortedQuestions(sorted);
-    
+  const sortedQuestions = useMemo(() => {
+    const threshold = roomDetail?.like_threshold || 0;
+    const filtered = questions.filter((q) => q.likeCount >= threshold);
+    return filtered.sort((a, b) => b.likeCount - a.likeCount);
   }, [questions, roomDetail?.like_threshold]);
 
   useEffect(() => {
-    filterAndSortQuestions();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [questions, roomDetail?.like_threshold]);
+    setPersistentQuestions((prevQuestions) => {
+      const newQuestions = sortedQuestions.filter(
+        (newQ) =>
+          !prevQuestions.some((prevQ) => prevQ.questionId === newQ.questionId)
+      );
+      return [...prevQuestions, ...newQuestions];
+    });
+  }, [sortedQuestions]);
 
   const handleConfirm = (questionId) => {
     console.log("Question confirmed:", questionId);
+    setPersistentQuestions((prevQuestions) =>
+      prevQuestions.filter((q) => q.questionId !== questionId)
+    );
   };
 
   if (!isConnected) {
@@ -64,7 +69,7 @@ const SpeakerRoomPage = () => {
         </div>
       )}
       <div className={styles.cardGrid}>
-        {sortedQuestions.map((question) => (
+        {persistentQuestions.map((question) => (
           <div key={question.questionId} className={styles.card}>
             <h2>{question.title}</h2>
             <p>{question.content}</p>
