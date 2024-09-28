@@ -14,8 +14,8 @@ import { questionsState } from "../../recoil/chat-atoms";
 import useRoom from "../../api/room/useRoom";
 import { roomIdState } from "../../recoil/room-atoms";
 
-const CLOUD_WIDTH = 200; // 증가된 너비
-const CLOUD_HEIGHT = 150; // 증가된 높이
+const CLOUD_WIDTH = 200;
+const CLOUD_HEIGHT = 150;
 
 const ChattingRoomPage = () => {
   const roomId = useRecoilValue(roomIdState);
@@ -24,6 +24,7 @@ const ChattingRoomPage = () => {
   const [viewportSize, setViewportSize] = useState({ width: 0, height: 0 });
   const cloudPositionsRef = useRef({});
   const { getQuestions, getGuests } = useRoom();
+
   const updateViewportSize = useCallback(() => {
     setViewportSize({
       width: window.innerWidth,
@@ -31,23 +32,30 @@ const ChattingRoomPage = () => {
     });
   }, []);
 
-  useEffect(() => {
+  const memoizedGetQuestions = useCallback(() => {
     getQuestions(roomId);
+  }, [getQuestions, roomId]);
+
+  const memoizedGetGuests = useCallback(() => {
     getGuests(roomId);
+  }, [getGuests, roomId]);
+
+  useEffect(() => {
+    memoizedGetQuestions();
+    memoizedGetGuests();
     updateViewportSize();
     window.addEventListener("resize", updateViewportSize);
     return () => window.removeEventListener("resize", updateViewportSize);
-  }, [updateViewportSize, getGuests, roomId, getQuestions]);
+  }, [memoizedGetQuestions, memoizedGetGuests, updateViewportSize]);
 
   const getRandomPosition = useCallback(
     (existingPositions) => {
-      const padding = 30; // 패딩 값을 약간 증가
+      const padding = 30;
       let attempts = 0;
       const maxAttempts = 100;
 
-      // 화면 하단 20% 영역의 시작 y 좌표 계산
-      const bottomAreaStart = viewportSize.height * 0.75; // 구름이 더 크므로 시작점을 약간 위로 조정
-      const bottomAreaHeight = viewportSize.height * 0.25; // 구름이 더 크므로 영역을 약간 확장
+      const bottomAreaStart = viewportSize.height * 0.75;
+      const bottomAreaHeight = viewportSize.height * 0.25;
 
       while (attempts < maxAttempts) {
         const x =
@@ -70,7 +78,6 @@ const ChattingRoomPage = () => {
         attempts++;
       }
 
-      // 최대 시도 횟수를 초과한 경우, 겹치더라도 위치 반환
       return {
         x: Math.random() * (viewportSize.width - CLOUD_WIDTH),
         y: bottomAreaStart + Math.random() * (bottomAreaHeight - CLOUD_HEIGHT),
