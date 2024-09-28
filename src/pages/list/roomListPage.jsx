@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useCallback } from "react";
 import styles from "./roomListPage.module.css";
 import copyIcon from "./copy.png";
 import useRoom from "../../api/room/useRoom";
@@ -13,24 +13,24 @@ const RoomListPage = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
-  useEffect(() => {
-    const fetchRooms = async () => {
-      try {
-        setLoading(true);
-        const fetchedRooms = await getRooms();
-        setRooms(fetchedRooms);
-        console.log(fetchedRooms);
-      } catch (error) {
-        console.error("Error fetching rooms:", error);
-        setError("방 목록을 불러오는 데 실패했습니다.");
-        navigate("/login");
-      } finally {
-        setLoading(false);
-      }
-    };
+  const fetchRooms = useCallback(async () => {
+    try {
+      setLoading(true);
+      const fetchedRooms = await getRooms();
+      setRooms(fetchedRooms);
+      console.log(fetchedRooms);
+    } catch (error) {
+      console.error("Error fetching rooms:", error);
+      setError("방 목록을 불러오는 데 실패했습니다.");
+    } finally {
+      setLoading(false);
+    }
+  }, [getRooms, setRooms]);
 
+  useEffect(() => {
     fetchRooms();
-  }, [getRooms, setRooms, navigate]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []); // 빈 의존성 배열
 
   const copyUrlToClipboard = (url) => {
     const fullUrl = `https://goojilgoojil.com/${url}/customize`;
