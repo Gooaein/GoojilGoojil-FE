@@ -8,7 +8,8 @@ import useChattingRoom from "../../../stomp/chat/useChattingRoom";
 export const ChattingInput = () => {
   const textareaRef = useRef(null);
   //TODO- 나중에 실제 값으로 바꿔야 함.
-  const { handleSendQuestion } = useChattingRoom(1, 1, false);
+  const roomId = localStorage.getItem("roomId");
+  const { handleSendQuestion } = useChattingRoom(roomId, false);
   const questionInput = useInput("", (value) => {
     const colonIndex = value.indexOf(":");
 
@@ -21,7 +22,7 @@ export const ChattingInput = () => {
     const content = value.slice(colonIndex + 1).trim();
 
     if (title && content) {
-      handleSendQuestion({ title, content } );
+      handleSendQuestion({ title, content });
       console.log({
         title: title,
         content: content,
