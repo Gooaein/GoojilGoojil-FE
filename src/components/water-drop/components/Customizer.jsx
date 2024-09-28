@@ -6,7 +6,8 @@ import { characterState } from "../../../recoil/character-atoms";
 import { createCompositeImage } from "../../../util/createCompositeImage";
 
 import { useNavigate, useParams } from "react-router-dom";
-import { sendAvatar } from "../../../api/room/avatar";
+import useRoom from "../../../api/room/useRoom";
+
 export const Customizer = () => {
   const [character, setCharacter] = useRecoilState(characterState);
   const navigate = useNavigate();
@@ -14,6 +15,7 @@ export const Customizer = () => {
     setCharacter((prev) => ({ ...prev, [feature]: value }));
   };
   const { uuid } = useParams();
+  const { postAvatar } = useRoom();
   // avatar_base64에서 MIME 타입 prefix를 제거하는 함수
   const removeMimeTypePrefix = (base64String) => {
     const prefixRegex = /^data:image\/[a-z]+;base64,/i;
@@ -25,7 +27,7 @@ export const Customizer = () => {
       const compositeImageData = await createCompositeImage(character);
       const compositePrefixImageData = removeMimeTypePrefix(compositeImageData);
       // 서버로 캐릭터 데이터와 합성 이미지를 함께 전송
-      await sendAvatar(compositePrefixImageData, uuid);
+      await postAvatar(compositePrefixImageData, uuid);
       navigate(`/${uuid}/chattingRoom`);
       alert("캐릭터가 저장되었습니다!");
     } catch (error) {

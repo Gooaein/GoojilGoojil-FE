@@ -11,18 +11,19 @@ import { ChattingInput } from "../../components/chat/input/ChattingInput";
 import useChattingRoom from "../../stomp/chat/useChattingRoom";
 import { useRecoilValue } from "recoil";
 import { questionsState } from "../../recoil/chat-atoms";
+import useRoom from "../../api/room/useRoom";
+import { roomIdState } from "../../recoil/room-atoms";
 
 const CLOUD_WIDTH = 200; // 증가된 너비
 const CLOUD_HEIGHT = 150; // 증가된 높이
 
 const ChattingRoomPage = () => {
-  const roomId = "1";
-  const userId = "user123";
-  const { handleSendLike } = useChattingRoom(roomId, userId, true);
+  const roomId = useRecoilValue(roomIdState);
+  const { handleSendLike } = useChattingRoom(roomId, true);
   const questions = useRecoilValue(questionsState);
   const [viewportSize, setViewportSize] = useState({ width: 0, height: 0 });
   const cloudPositionsRef = useRef({});
-
+  const { getQuestions, getGuests } = useRoom();
   const updateViewportSize = useCallback(() => {
     setViewportSize({
       width: window.innerWidth,
@@ -31,10 +32,12 @@ const ChattingRoomPage = () => {
   }, []);
 
   useEffect(() => {
+    getQuestions(roomId);
+    getGuests(roomId);
     updateViewportSize();
     window.addEventListener("resize", updateViewportSize);
     return () => window.removeEventListener("resize", updateViewportSize);
-  }, [updateViewportSize]);
+  }, [updateViewportSize, getGuests, roomId, getQuestions]);
 
   const getRandomPosition = useCallback(
     (existingPositions) => {

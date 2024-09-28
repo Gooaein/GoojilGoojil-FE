@@ -4,7 +4,7 @@ import { activeUsersState, questionsState } from "../../recoil/chat-atoms";
 import { QUESTION_LIFETIME } from "../../constants/questionLifeTime";
 import { useStompClient } from "../../context/StompContext";
 
-const useChattingRoom = (roomId, userId, isUseEffectOn) => {
+const useChattingRoom = (roomId, isUseEffectOn) => {
   const [questions, setQuestions] = useRecoilState(questionsState);
   const setActiveUsers = useSetRecoilState(activeUsersState);
   const { isConnected, stompClientRef } = useStompClient();
@@ -156,10 +156,9 @@ const useChattingRoom = (roomId, userId, isUseEffectOn) => {
         type: "like",
         question_id: questionId,
         sendTime: new Date().toISOString(),
-        userId: userId,
       });
     },
-    [userId, sendMessage, roomId]
+    [sendMessage, roomId]
   );
 
   useEffect(() => {
@@ -186,7 +185,6 @@ const useChattingRoom = (roomId, userId, isUseEffectOn) => {
         }
         sendMessage(`/app/rooms/${roomId}/out`, {
           type: "out",
-          guest_id: userId,
           sendTime: new Date().toISOString(),
         });
         clearInterval(timerIntervalId);
@@ -199,7 +197,6 @@ const useChattingRoom = (roomId, userId, isUseEffectOn) => {
     isConnected,
     stompClientRef,
     roomId,
-    userId,
     sendMessage,
     handleIncomingMessage,
     updateQuestionTimers,

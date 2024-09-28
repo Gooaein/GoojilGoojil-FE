@@ -15,6 +15,11 @@ export const makeRoom = async (name, date, location, like_threshold) => {
   return data;
 };
 
+//수강자가 참여자 목록을 얻을 때,
+export const getGuests = async (roomId) => {
+  sendRequest(userRoomsIntance, "get", `/${roomId}/guests`);
+};
+
 //강연자가 방목록을 얻을 때,
 export const getRoom = async (avartar, roomId) => {
   sendRequest(userRoomsIntance, "get", ``);
@@ -28,5 +33,6 @@ export const getReview = async (roomId) => {
 };
 
 export const getQuestions = async (roomId) => {
-  sendRequest(userRoomsIntance, "post", `/${roomId}/questions`);
+  const response = sendRequest(userRoomsIntance, "get", `/${roomId}/questions`);
+  return response;
 };
