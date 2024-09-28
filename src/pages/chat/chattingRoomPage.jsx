@@ -68,6 +68,7 @@ const ChattingRoomPage = () => {
 
     if (availableCells.length === 0) return null;
 
+    // Randomly select a cell from available cells
     const randomCell =
       availableCells[Math.floor(Math.random() * availableCells.length)];
     gridRef.current[randomCell.y][randomCell.x] = true;
@@ -84,20 +85,19 @@ const ChattingRoomPage = () => {
     initializeGrid();
     const newPositions = {};
 
-    questions.forEach((question) => {
-      if (!newPositions[question.questionId]) {
-        const position = getRandomPosition();
-        if (position) {
-          newPositions[question.questionId] = position;
-        }
-      } else {
-        newPositions[question.questionId] = cloudPositions[question.questionId];
+    // Shuffle questions to assign random positions
+    const shuffledQuestions = [...questions].sort(() => Math.random() - 0.5);
+
+    shuffledQuestions.forEach((question) => {
+      const position = getRandomPosition();
+      if (position) {
+        newPositions[question.questionId] = position;
       }
     });
 
     setCloudPositions(newPositions);
     positionsCalculatedRef.current = true;
-  }, [questions, getRandomPosition, initializeGrid, cloudPositions]);
+  }, [questions, getRandomPosition, initializeGrid]);
 
   useEffect(() => {
     if (!positionsCalculatedRef.current) {
