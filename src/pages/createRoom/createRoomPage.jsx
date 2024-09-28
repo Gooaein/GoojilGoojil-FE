@@ -11,26 +11,30 @@ const CreateRoom = () => {
   const [modalOpen, setModalOpen] = useState(false);
   const [roomUrl, setRoomUrl] = useState("");
 
-  // 입력 필드들의 상태 관리
   const [roomName, setRoomName] = useState("");
   const [lectureDate, setLectureDate] = useState(new Date());
   const [lecturePlace, setLecturePlace] = useState("");
-
-  // 임시로 like_threshold 값 설정 (실제 구현에서는 이 값을 적절히 설정해야 함)
   const [likeThreshold, setLikeThreshold] = useState(10);
+
   const { makeRoom } = useRoom();
   const { accessToken } = useAuthCookies();
   const navigate = useNavigate();
+
   useEffect(() => {
-    // if (!accessToken) {
-    //   // navigate("/login");
-    // }
     console.log(accessToken);
   }, [accessToken, navigate]);
 
+  const handleDateChange = (e) => {
+    const date = new Date(e.target.value + "T00:00:00"); // 시간을 00:00:00으로 설정
+    setLectureDate(date);
+  };
+
+  const formatDateForInput = (date) => {
+    return date.toISOString().split("T")[0];
+  };
+
   async function handleCreateButton() {
     try {
-      // makeRoom 함수 호출
       await makeRoom(
         roomName,
         formatDateToISO(lectureDate),
@@ -38,13 +42,11 @@ const CreateRoom = () => {
         likeThreshold
       );
 
-      // TODO: 실제 roomId로 URL을 생성해야 함
       const generatedUrl = `https://example.com/${roomName}`;
       setRoomUrl(generatedUrl);
       setModalOpen(true);
     } catch (error) {
       console.error("방 생성 중 오류 발생:", error);
-      // 오류 처리 로직 추가 (예: 사용자에게 오류 메시지 표시)
     }
   }
 
@@ -55,7 +57,7 @@ const CreateRoom = () => {
         <input
           type="text"
           id="roomName"
-          placeholder="방 이름을  입력해주세요..."
+          placeholder="방 이름을 입력해주세요..."
           className={styles.inputBox}
           value={roomName}
           onChange={(e) => setRoomName(e.target.value)}
@@ -69,8 +71,8 @@ const CreateRoom = () => {
           type="date"
           id="lectureDate"
           className={styles.inputBox}
-          value={lectureDate}
-          onChange={(e) => setLectureDate(e.target.value)}
+          value={formatDateForInput(lectureDate)}
+          onChange={handleDateChange}
         />
       </div>
 
@@ -87,14 +89,14 @@ const CreateRoom = () => {
       </div>
 
       <div className={styles.inputGroup}>
-        <label htmlFor="lecturePlace">4. 저장되는 최소 공감수</label>
+        <label htmlFor="likeThreshold">4. 저장되는 최소 공감수</label>
         <input
           type="number"
           id="likeThreshold"
           placeholder="명예의 전당에 저장되는 최소 공감 수를 설정하세요!"
           className={styles.inputBox}
           value={likeThreshold}
-          onChange={(e) => setLikeThreshold(e.target.value)}
+          onChange={(e) => setLikeThreshold(Number(e.target.value))}
         />
       </div>
 
