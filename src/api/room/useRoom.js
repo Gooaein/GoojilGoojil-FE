@@ -12,7 +12,7 @@ import { useNavigate } from "react-router-dom";
 import { activeUsersState, questionsState } from "../../recoil/chat-atoms";
 import { sendAvatar } from "./avatar";
 
-export const useRoom = () => {
+export const useRoom = async () => {
   const setRoomData = useSetRecoilState(roomDataState);
   const setReview = useSetRecoilState(reviewState);
   const setActiveUsers = useSetRecoilState(activeUsersState);
@@ -94,7 +94,7 @@ export const useRoom = () => {
   const postAvatar = async (avatar_base64, uuid) => {
     try {
       const data = await sendAvatar(avatar_base64, uuid);
-      setRoomId(data.roomId);
+      await setRoomId(data.roomId);
     } catch (error) {
       console.error("Failed to post Avatar:", error);
     }
