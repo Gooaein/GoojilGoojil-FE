@@ -44,7 +44,7 @@ export const useRoom = () => {
           location,
           like_threshold
         );
-        console.log(data);
+        console.log(`data: `, data);
         setRoomData(data.data.uuid);
         return data; // 방 생성 후 roomId를 포함한 데이터를 반환
       } catch (error) {
