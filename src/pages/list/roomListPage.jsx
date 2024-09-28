@@ -40,6 +40,7 @@ const RoomListPage = () => {
   };
 
   const handleEnterRoom = (roomId) => {
+    localStorage.setItem("roomId", roomId);
     navigate("/speakerRoom");
     console.log("Entering room:", roomId);
   };

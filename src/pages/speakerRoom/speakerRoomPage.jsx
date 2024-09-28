@@ -2,7 +2,7 @@ import React, { useEffect, useState, useCallback } from "react";
 import styles from "./speakerRoomPage.module.css";
 import useChattingRoom from "../../stomp/chat/useChattingRoom";
 import heartImage from "./heart.png";
-import { useRecoilValue, useSetRecoilState } from "recoil";
+import { useRecoilValue } from "recoil";
 import { roomDetailState } from "../../recoil/room-atoms";
 import useRoom from "../../api/room/useRoom";
 
@@ -11,20 +11,19 @@ const SpeakerRoomPage = () => {
   const { questions, isConnected } = useChattingRoom(roomId, true);
   const [sortedQuestions, setSortedQuestions] = useState([]);
   const roomDetail = useRecoilValue(roomDetailState);
-  const setRoomDetail = useSetRecoilState(roomDetailState);
   const { getRoomDetail } = useRoom();
 
   useEffect(() => {
     const fetchRoomDetail = async () => {
       try {
-        const detail = await getRoomDetail(roomId);
-        setRoomDetail(detail.data);
+        await getRoomDetail(roomId);
       } catch (error) {
         console.error("Failed to fetch room details:", error);
       }
     };
     fetchRoomDetail();
-  }, [roomId, getRoomDetail, setRoomDetail]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [roomId]);
 
   const filterAndSortQuestions = useCallback(() => {
     const filtered = questions.filter(
@@ -36,7 +35,8 @@ const SpeakerRoomPage = () => {
 
   useEffect(() => {
     filterAndSortQuestions();
-  }, [filterAndSortQuestions]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [questions, roomDetail?.like_threshold]);
 
   const handleConfirm = (questionId) => {
     console.log("Question confirmed:", questionId);
