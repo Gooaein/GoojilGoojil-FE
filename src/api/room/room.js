@@ -21,11 +21,6 @@ export const getGuests = async (roomId) => {
   return response;
 };
 
-//강연자가 방목록을 얻을 때,
-export const getRoom = async (avartar, roomId) => {
-  sendRequest(userRoomsIntance, "get", ``);
-};
-
 export const makeReview = async (roomId) => {
   sendRequest(userRoomsIntance, "post", `/${roomId}/reviews`);
 };
@@ -37,3 +32,16 @@ export const getQuestions = async (roomId) => {
   const response = sendRequest(userRoomsIntance, "get", `/${roomId}/questions`);
   return response;
 };
+
+//강연자가 방목록을 얻을 때,
+export const getRooms = async (roomId) => {
+  const response = await sendRequest(userRoomsIntance, "get", ``, roomId);
+  return response;
+};
+
+export const getRoomDetail = async (roomId) => {
+  const response = sendRequest(userRoomsIntance, "get", `/${roomId}`);
+  return response;
+};
+
+//29번

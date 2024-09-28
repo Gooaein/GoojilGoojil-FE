@@ -2,7 +2,12 @@
 import { useSetRecoilState } from "recoil";
 
 import * as roomAPI from "./room";
-import { reviewState, roomDataState } from "../../recoil/room-atoms";
+import {
+  reviewState,
+  roomDataState,
+  roomDetailState,
+  roomsState,
+} from "../../recoil/room-atoms";
 import useAuthCookies from "../../hooks/useAuthCookies";
 import { useNavigate } from "react-router-dom";
 import { activeUsersState, questionsState } from "../../recoil/chat-atoms";
@@ -13,6 +18,8 @@ export const useRoom = () => {
   const setReview = useSetRecoilState(reviewState);
   const setActiveUsers = useSetRecoilState(activeUsersState);
   const setQuestions = useSetRecoilState(questionsState);
+  const setRoomDetail = useSetRecoilState(roomDetailState);
+  const setRooms = useSetRecoilState(roomsState);
   const { accessToken } = useAuthCookies();
   const navigate = useNavigate();
 
@@ -51,15 +58,6 @@ export const useRoom = () => {
     }
   };
 
-  const getRoom = async (avatar, roomId) => {
-    try {
-      const data = await roomAPI.getRoom(avatar, roomId);
-      setRoomData(data);
-    } catch (error) {
-      console.error("Failed to get room:", error);
-    }
-  };
-
   const makeReview = async (avatar, roomId) => {
     try {
       const data = await roomAPI.makeReview(avatar, roomId);
@@ -87,6 +85,25 @@ export const useRoom = () => {
     }
   };
 
+  const getRooms = async () => {
+    try {
+      const response = await roomAPI.getRooms();
+      console.log("getRooms", response);
+      setRooms(response.data);
+    } catch (error) {
+      console.error("Failed to get rooms:", error);
+    }
+  };
+
+  const getRoomDetail = async (roomId) => {
+    try {
+      const response = await roomAPI.getRoomDetail(roomId);
+      console.log("getDetailQuestion, ", response);
+      setRoomDetail(response.data);
+    } catch (error) {
+      console.error("Failed to get questions:", error);
+    }
+  };
   const postAvatar = async (avatar_base64, uuid) => {
     try {
       const data = await sendAvatar(avatar_base64, uuid);
@@ -99,12 +116,13 @@ export const useRoom = () => {
   return {
     getInitialRoomData,
     makeRoom,
-    getRoom,
+    getRooms,
     makeReview,
     getReview,
     getQuestions,
     getGuests,
     postAvatar,
+    getRoomDetail,
   };
 };
 

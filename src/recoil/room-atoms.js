@@ -9,6 +9,16 @@ export const roomIdState = atom({
   key: "roomIdState",
   default: null,
 });
+
+export const roomDetailState = atom({
+  key: "roomDetailState",
+  default: null,
+});
+
+export const roomsState = atom({
+  key: "roomsState",
+  default: null,
+});
 export const avatarState = atom({
   key: "avatarState",
   default: null,

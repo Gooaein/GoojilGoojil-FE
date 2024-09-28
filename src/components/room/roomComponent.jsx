@@ -1,9 +1,11 @@
-// RoomComponent.js
 import React from "react";
-import styles from "./roomComponent.module.css"; // 스타일 시트
+import { useNavigate } from "react-router-dom";
+import styles from "./roomComponent.module.css";
 
 const RoomComponent = ({ isOpen, onClose, url }) => {
-  if (!isOpen) return null; // 팝업이 열려있지 않으면 null 반환
+  const navigate = useNavigate();
+
+  if (!isOpen) return null;
 
   const copyUrlToClipboard = () => {
     navigator.clipboard.writeText(url).then(
@@ -12,11 +14,16 @@ const RoomComponent = ({ isOpen, onClose, url }) => {
     );
   };
 
+  const goToRoomList = () => {
+    navigate("/list");
+    onClose(); // 팝업을 닫습니다.
+  };
+
   return (
     <div className={styles.overlay} onClick={onClose}>
       <div className={styles.modal} onClick={(e) => e.stopPropagation()}>
         <div className={styles.closeIcon} onClick={onClose}>
-          &times; {/* 'X' 표시 */}
+          &times;
         </div>
         <h2 style={{ fontSize: "1.2rem" }}>정상적으로 방이 생성되었습니다!</h2>
         <div className={styles.urlContainer}>
@@ -29,6 +36,9 @@ const RoomComponent = ({ isOpen, onClose, url }) => {
             </button>
           </div>
         </div>
+        <button className={styles.listButton} onClick={goToRoomList}>
+          수업 목록으로 가기
+        </button>
       </div>
     </div>
   );
