@@ -24,6 +24,12 @@ const ChattingRoomPage = () => {
   const roomId = localStorage.getItem("roomId");
   const navigate = useNavigate();
   const { uuid } = useParams();
+  const { handleSendLike } = useChattingRoom(roomId, true);
+  const questions = useRecoilValue(questionsState);
+  const setPopularQuestions = useSetRecoilState(popularQuestionsState);
+  const [viewportSize, setViewportSize] = useState({ width: 0, height: 0 });
+  const cloudPositionsRef = useRef({});
+
   useEffect(() => {
     const fetchData = async () => {
       if (roomId && !dataFetchedRef.current) {
@@ -41,11 +47,6 @@ const ChattingRoomPage = () => {
 
     fetchData();
   }, [roomId, getQuestions, getGuests, navigate, getRoomDetail, uuid]);
-  const { handleSendLike } = useChattingRoom(roomId, true);
-  const questions = useRecoilValue(questionsState);
-  const setPopularQuestions = useSetRecoilState(popularQuestionsState);
-  const [viewportSize, setViewportSize] = useState({ width: 0, height: 0 });
-  const cloudPositionsRef = useRef({});
 
   const updateViewportSize = useCallback(() => {
     setViewportSize({
@@ -62,8 +63,16 @@ const ChattingRoomPage = () => {
 
   // 새로운 useEffect를 추가하여 popularQuestionState 업데이트
   useEffect(() => {
-    const updatedPopularQuestions = questions.filter((q) => q.likeCount > 3);
-    setPopularQuestions(updatedPopularQuestions);
+    setPopularQuestions((prev) => {
+      const updatedPopularQuestions = questions.filter((q) => q.likeCount > 3);
+      const combinedQuestions = [...prev, ...updatedPopularQuestions];
+      // 중복 제거 및 좋아요 수에 따른 정렬
+      const uniqueQuestions = Array.from(
+        new Set(combinedQuestions.map((q) => q.questionId))
+      ).map((id) => combinedQuestions.find((q) => q.questionId === id));
+
+      return uniqueQuestions.sort((a, b) => b.likeCount - a.likeCount);
+    });
   }, [questions, setPopularQuestions]);
 
   const getRandomPosition = useCallback(
