@@ -6,8 +6,8 @@ import useRoom from "../../api/room/useRoom";
 import useAuthCookies from "../../hooks/useAuthCookies";
 import { useNavigate } from "react-router-dom";
 import { formatDateToISO } from "../../util/currentTimeUtil";
-import { useRecoilValue } from "recoil";
 import { roomDataState } from "../../recoil/room-atoms";
+import { useRecoilCallback } from "recoil";
 
 const CreateRoom = () => {
   const [modalOpen, setModalOpen] = useState(false);
@@ -21,7 +21,6 @@ const CreateRoom = () => {
   const { makeRoom } = useRoom();
   const { accessToken } = useAuthCookies();
   const navigate = useNavigate();
-  const recoilUrlUUID = useRecoilValue(roomDataState);
   useEffect(() => {
     console.log(accessToken);
   }, [accessToken, navigate]);
@@ -34,23 +33,33 @@ const CreateRoom = () => {
   const formatDateForInput = (date) => {
     return date.toISOString().split("T")[0];
   };
+  const handleCreateButton = useRecoilCallback(
+    ({ set }) =>
+      async () => {
+        try {
+          const result = await makeRoom(
+            roomName,
+            formatDateToISO(lectureDate),
+            lecturePlace,
+            likeThreshold
+          );
 
-  async function handleCreateButton() {
-    try {
-      await makeRoom(
-        roomName,
-        formatDateToISO(lectureDate),
-        lecturePlace,
-        likeThreshold
-      );
-      const urlUUID = recoilUrlUUID;
-      const generatedUrl = `https://goojilgoojil.com/${urlUUID}/customize`;
-      setRoomUrl(generatedUrl);
-      setModalOpen(true);
-    } catch (error) {
-      console.error("방 생성 중 오류 발생:", error);
-    }
-  }
+          // UUID 추출
+          const uuid = result.data.data.uuid;
+
+          // Recoil 상태 업데이트 (예시)
+          set(roomDataState, { uuid });
+
+          // URL 생성
+          const generatedUrl = `https://goojilgoojil.com/${uuid}/customize`;
+          setRoomUrl(generatedUrl);
+          setModalOpen(true);
+        } catch (error) {
+          console.error("방 생성 중 오류 발생:", error);
+        }
+      },
+    [roomName, lectureDate, lecturePlace, likeThreshold, makeRoom]
+  );
 
   return (
     <div className={styles.formContainer}>
