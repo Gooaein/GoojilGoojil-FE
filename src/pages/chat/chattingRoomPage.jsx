@@ -75,33 +75,32 @@ const ChattingRoomPage = () => {
   }, []);
 
   useEffect(() => {
-    const newPositions = {};
-    const existingPositions = [];
+    setCloudPositions((prevPositions) => {
+      const newPositions = { ...prevPositions };
+      const existingPositions = Object.values(newPositions);
 
-    questions.forEach((question) => {
-      if (!cloudPositions[question.questionId]) {
-        let position;
-        let attempts = 0;
-        const maxAttempts = 50;
+      questions.forEach((question) => {
+        if (!newPositions[question.questionId]) {
+          let position;
+          let attempts = 0;
+          const maxAttempts = 50;
 
-        do {
-          position = getRandomPosition();
-          attempts++;
-        } while (
-          checkOverlap(position, existingPositions) &&
-          attempts < maxAttempts
-        );
+          do {
+            position = getRandomPosition();
+            attempts++;
+          } while (
+            checkOverlap(position, existingPositions) &&
+            attempts < maxAttempts
+          );
 
-        newPositions[question.questionId] = position;
-        existingPositions.push(position);
-      } else {
-        newPositions[question.questionId] = cloudPositions[question.questionId];
-        existingPositions.push(cloudPositions[question.questionId]);
-      }
+          newPositions[question.questionId] = position;
+          existingPositions.push(position);
+        }
+      });
+
+      return newPositions;
     });
-
-    setCloudPositions(newPositions);
-  }, [questions, getRandomPosition, checkOverlap, cloudPositions]);
+  }, [questions, getRandomPosition, checkOverlap]);
 
   return (
     <div className={styles.container}>
