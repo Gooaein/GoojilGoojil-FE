@@ -8,7 +8,11 @@ import useRoom from "../../api/room/useRoom";
 
 const SpeakerRoomPage = () => {
   const roomId = localStorage.getItem("roomId");
-  const { questions, isConnected } = useChattingRoom(roomId, true);
+  const { questions: incomingQuestions, isConnected } = useChattingRoom(
+    roomId,
+    true
+  );
+  const [persistentQuestions, setPersistentQuestions] = useState([]);
   const [sortedQuestions, setSortedQuestions] = useState([]);
   const roomDetail = useRecoilValue(roomDetailState);
   const { getRoomDetail } = useRoom();
@@ -25,21 +29,33 @@ const SpeakerRoomPage = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [roomId]);
 
+  useEffect(() => {
+    setPersistentQuestions((prevQuestions) => {
+      const newQuestions = incomingQuestions.filter(
+        (newQ) =>
+          !prevQuestions.some((prevQ) => prevQ.questionId === newQ.questionId)
+      );
+      return [...prevQuestions, ...newQuestions];
+    });
+  }, [incomingQuestions]);
+
   const filterAndSortQuestions = useCallback(() => {
-    const filtered = questions.filter(
+    const filtered = persistentQuestions.filter(
       (q) => q.likeCount >= (roomDetail?.like_threshold || 0)
     );
     const sorted = filtered.sort((a, b) => b.likeCount - a.likeCount);
     setSortedQuestions(sorted);
-  }, [questions, roomDetail?.like_threshold]);
+  }, [persistentQuestions, roomDetail?.like_threshold]);
 
   useEffect(() => {
     filterAndSortQuestions();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [questions, roomDetail?.like_threshold]);
+  }, [filterAndSortQuestions]);
 
   const handleConfirm = (questionId) => {
     console.log("Question confirmed:", questionId);
+    setPersistentQuestions((prevQuestions) =>
+      prevQuestions.filter((q) => q.questionId !== questionId)
+    );
   };
 
   if (!isConnected) {
