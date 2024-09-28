@@ -12,7 +12,6 @@ import { roomDataState } from "../../recoil/room-atoms";
 const CreateRoom = () => {
   const [modalOpen, setModalOpen] = useState(false);
   const [roomUrl, setRoomUrl] = useState("");
-  const [roomCreated, setRoomCreated] = useState(false);
 
   const [roomName, setRoomName] = useState("");
   const [lectureDate, setLectureDate] = useState(new Date());
@@ -22,20 +21,10 @@ const CreateRoom = () => {
   const { makeRoom } = useRoom();
   const { accessToken } = useAuthCookies();
   const navigate = useNavigate();
-  const urlUUID = useRecoilValue(roomDataState);
-
+  const recoilUrlUUID = useRecoilValue(roomDataState);
   useEffect(() => {
     console.log(accessToken);
   }, [accessToken, navigate]);
-
-  useEffect(() => {
-    if (roomCreated && urlUUID) {
-      const generatedUrl = `https://goojilgoojil.com/${urlUUID}/customize`;
-      setRoomUrl(generatedUrl);
-      setModalOpen(true);
-      setRoomCreated(false); // Reset the flag
-    }
-  }, [urlUUID, roomCreated]);
 
   const handleDateChange = (e) => {
     const date = new Date(e.target.value + "T00:00:00"); // 시간을 00:00:00으로 설정
@@ -54,7 +43,10 @@ const CreateRoom = () => {
         lecturePlace,
         likeThreshold
       );
-      setRoomCreated(true); // Set the flag to true after room creation
+      const urlUUID = recoilUrlUUID;
+      const generatedUrl = `https://goojilgoojil.com/${urlUUID}/customize`;
+      setRoomUrl(generatedUrl);
+      setModalOpen(true);
     } catch (error) {
       console.error("방 생성 중 오류 발생:", error);
     }
