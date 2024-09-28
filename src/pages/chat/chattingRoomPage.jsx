@@ -22,7 +22,6 @@ const ChattingRoomPage = () => {
 
   const { getGuests, getQuestions } = useRoom();
   const dataFetchedRef = useRef(false);
-  const positionsGeneratedRef = useRef(false);
   const navigate = useNavigate();
   const { uuid } = useParams();
 
@@ -60,7 +59,7 @@ const ChattingRoomPage = () => {
   }, [roomId, getQuestions, getGuests, navigate, uuid]);
 
   useEffect(() => {
-    if (!positionsGeneratedRef.current && containerRef.current) {
+    if (containerRef.current && questions.length > 0) {
       setCloudPositions((prevPositions) => {
         const newPositions = { ...prevPositions };
         questions.forEach((question) => {
@@ -68,7 +67,6 @@ const ChattingRoomPage = () => {
             newPositions[question.questionId] = generateRandomPosition();
           }
         });
-        positionsGeneratedRef.current = true;
         return newPositions;
       });
     }
