@@ -14,7 +14,8 @@ import { questionsState } from "../../recoil/chat-atoms";
 import { useNavigate, useParams } from "react-router-dom";
 import useRoom from "../../api/room/useRoom";
 
-const GRID_SIZE = 200; // 그리드 셀의 크기
+const CLOUD_WIDTH = 150;
+const CLOUD_HEIGHT = 100;
 
 const ChattingRoomPage = () => {
   const { getGuests, getQuestions } = useRoom();
@@ -22,74 +23,6 @@ const ChattingRoomPage = () => {
   const roomId = localStorage.getItem("roomId");
   const navigate = useNavigate();
   const { uuid } = useParams();
-
-  const { handleSendLike } = useChattingRoom(roomId, true);
-  const questions = useRecoilValue(questionsState);
-  const [viewportSize, setViewportSize] = useState({ width: 0, height: 0 });
-  const cloudPositionsRef = useRef({});
-  const gridRef = useRef([]);
-
-  const updateViewportSize = useCallback(() => {
-    setViewportSize({
-      width: window.innerWidth,
-      height: window.innerHeight,
-    });
-  }, []);
-
-  useEffect(() => {
-    updateViewportSize();
-    window.addEventListener("resize", updateViewportSize);
-    return () => window.removeEventListener("resize", updateViewportSize);
-  }, [updateViewportSize]);
-
-  const initializeGrid = useCallback(() => {
-    const columns = Math.floor(viewportSize.width / GRID_SIZE);
-    const rows = Math.floor(viewportSize.height / GRID_SIZE);
-    gridRef.current = Array(rows)
-      .fill()
-      .map(() => Array(columns).fill(false));
-  }, [viewportSize]);
-
-  const findAvailableCell = useCallback(() => {
-    const rows = gridRef.current.length;
-    const columns = gridRef.current[0].length;
-
-    for (let i = 0; i < rows; i++) {
-      for (let j = 0; j < columns; j++) {
-        if (!gridRef.current[i][j]) {
-          return { row: i, col: j };
-        }
-      }
-    }
-    return null;
-  }, []);
-
-  const positionCloud = useCallback(
-    (questionId) => {
-      const cell = findAvailableCell();
-      if (cell) {
-        const { row, col } = cell;
-        gridRef.current[row][col] = true;
-        cloudPositionsRef.current[questionId] = {
-          x: col * GRID_SIZE,
-          y: row * GRID_SIZE,
-        };
-      }
-    },
-    [findAvailableCell]
-  );
-
-  useEffect(() => {
-    initializeGrid();
-    Object.keys(cloudPositionsRef.current).forEach((id) => {
-      positionCloud(id);
-    });
-    questions.forEach((question) => {
-      if (!cloudPositionsRef.current[question.questionId]) {
-        positionCloud(question.questionId);
-      }
-    });
-  }, [questions, initializeGrid, positionCloud]);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -107,30 +40,85 @@ const ChattingRoomPage = () => {
 
     fetchData();
   }, [roomId, getQuestions, getGuests, navigate, uuid]);
+  const { handleSendLike } = useChattingRoom(roomId, true);
+  const questions = useRecoilValue(questionsState);
+  const [viewportSize, setViewportSize] = useState({ width: 0, height: 0 });
+  const cloudPositionsRef = useRef({});
 
-  const memoizedQuestionClouds = useMemo(() => {
-    return questions.map((question) => {
-      const position = cloudPositionsRef.current[question.questionId];
-      if (!position) return null;
-
-      return (
-        <QuestionCloud
-          key={question.questionId}
-          question={question}
-          handleSendLike={handleSendLike}
-          style={{
-            position: "absolute",
-            left: `${position.x}px`,
-            top: `${position.y}px`,
-          }}
-        />
-      );
+  const updateViewportSize = useCallback(() => {
+    setViewportSize({
+      width: window.innerWidth,
+      height: window.innerHeight,
     });
-  }, [questions, handleSendLike]);
+  }, []);
+
+  useEffect(() => {
+    updateViewportSize();
+    window.addEventListener("resize", updateViewportSize);
+    return () => window.removeEventListener("resize", updateViewportSize);
+  }, [updateViewportSize]);
+
+  const getRandomPosition = useCallback(
+    (existingPositions) => {
+      const padding = 20;
+      let attempts = 0;
+      const maxAttempts = 100;
+
+      while (attempts < maxAttempts) {
+        const x =
+          Math.random() * (viewportSize.width - CLOUD_WIDTH - padding * 2) +
+          padding;
+        const y =
+          Math.random() * (viewportSize.height - CLOUD_HEIGHT - padding * 2) +
+          padding;
+
+        const overlap = existingPositions.some(
+          (pos) =>
+            Math.abs(pos.x - x) < CLOUD_WIDTH &&
+            Math.abs(pos.y - y) < CLOUD_HEIGHT
+        );
+
+        if (!overlap) {
+          return { x, y };
+        }
+
+        attempts++;
+      }
+
+      return {
+        x: Math.random() * (viewportSize.width - CLOUD_WIDTH),
+        y: Math.random() * (viewportSize.height - CLOUD_HEIGHT),
+      };
+    },
+    [viewportSize.width, viewportSize.height]
+  );
+
+  useMemo(() => {
+    questions.forEach((question) => {
+      if (!cloudPositionsRef.current[question.questionId]) {
+        const existingPositions = Object.values(cloudPositionsRef.current);
+        const position = getRandomPosition(existingPositions);
+        cloudPositionsRef.current[question.questionId] = position;
+      }
+    });
+  }, [questions, getRandomPosition]);
 
   return (
     <div className={styles.container}>
-      <div className={styles.cloudContainer}>{memoizedQuestionClouds}</div>
+      <div className={styles.cloudContainer}>
+        {questions.map((question) => (
+          <QuestionCloud
+            key={question.questionId}
+            question={question}
+            handleSendLike={handleSendLike}
+            style={{
+              position: "absolute",
+              left: `${cloudPositionsRef.current[question.questionId]?.x}px`,
+              top: `${cloudPositionsRef.current[question.questionId]?.y}px`,
+            }}
+          />
+        ))}
+      </div>
       <ChattingInput />
     </div>
   );
