@@ -1,9 +1,10 @@
-import React, { useState, useMemo, useCallback } from "react";
+import React, { useState, useMemo, useCallback, useEffect } from "react";
 import styles from "./QuestionCloud.module.css";
 import { QUESTION_LIFETIME } from "../../../constants/questionLifeTime";
 import chatCloudImage from "../../../assets/images/chat/chatCloudImage.png";
 import Portal from "../../common/Portal";
-
+import { useLottie } from "lottie-react";
+import animationData from "../../../assets/animation/rain.json";
 const getOpacity = (remainingTime) => {
   if (typeof remainingTime !== "number" || isNaN(remainingTime)) {
     return 0.3;
@@ -26,8 +27,9 @@ const getCloudSize = (likeCount) => {
 };
 
 export const QuestionCloud = React.memo(
-  ({ question, handleSendLike, style, ...props }) => {
+  ({ question, handleSendLike, style, onRemove, ...props }) => {
     const [isModalOpen, setIsModalOpen] = useState(false);
+    const [showAnimation, setShowAnimation] = useState(false);
 
     const cloudStyle = useMemo(() => {
       const size = getCloudSize(question.likeCount);
@@ -43,6 +45,7 @@ export const QuestionCloud = React.memo(
         display: "flex",
         alignItems: "center",
         justifyContent: "center",
+        position: "relative",
       };
     }, [question.remainingTime, question.likeCount, style]);
 
@@ -62,6 +65,35 @@ export const QuestionCloud = React.memo(
       [handleSendLike, question.questionId]
     );
 
+    const lottieOptions = {
+      animationData: animationData,
+      loop: false,
+      autoplay: false,
+    };
+
+    const { View: LottieView, play } = useLottie(lottieOptions, {
+      height: "100%",
+      width: "100%",
+    });
+
+    useEffect(() => {
+      if (question.likeCount >= 5 && !showAnimation) {
+        setShowAnimation(true);
+        play();
+      }
+    }, [question.likeCount, showAnimation, play]);
+
+    const handleAnimationComplete = useCallback(() => {
+      onRemove(question.questionId);
+    }, [onRemove, question.questionId]);
+
+    useEffect(() => {
+      if (showAnimation) {
+        const timer = setTimeout(handleAnimationComplete, 3000); // 애니메이션 지속 시간
+        return () => clearTimeout(timer);
+      }
+    }, [showAnimation, handleAnimationComplete]);
+
     return (
       <>
         <div
@@ -71,6 +103,9 @@ export const QuestionCloud = React.memo(
           {...props}
         >
           <p>{question.title}</p>
+          {showAnimation && (
+            <div className={styles.animationWrapper}>{LottieView}</div>
+          )}
         </div>
         {isModalOpen && (
           <Portal>
