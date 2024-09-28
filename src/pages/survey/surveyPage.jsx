@@ -23,6 +23,7 @@ ChartJS.register(
 const QuestionAnalysis = () => {
   const [questions, setQuestions] = useState([]);
   const roomId = localStorage.getItem("roomId");
+
   const getQuestions = useCallback(async () => {
     try {
       const response = await roomAPI.getQuestions(roomId);
@@ -51,11 +52,31 @@ const QuestionAnalysis = () => {
     return wordCount;
   }, [questions]);
 
+  const generateColorArray = (count) => {
+    const colors = [
+      "#FF6384",
+      "#36A2EB",
+      "#FFCE56",
+      "#4BC0C0",
+      "#9966FF",
+      "#FF9F40",
+      "#FF6384",
+      "#C9CBCF",
+      "#4BC0C0",
+      "#FF9F40",
+    ];
+    return Array(count)
+      .fill()
+      .map((_, i) => colors[i % colors.length]);
+  };
+
   const chartData = useMemo(() => {
     if (Object.keys(wordFrequency).length > 0) {
       const sortedWords = Object.entries(wordFrequency)
         .sort((a, b) => b[1] - a[1])
         .slice(0, 20);
+
+      const backgroundColors = generateColorArray(sortedWords.length);
 
       return {
         labels: sortedWords.map(([word]) => word),
@@ -63,7 +84,11 @@ const QuestionAnalysis = () => {
           {
             label: "Word Frequency",
             data: sortedWords.map(([, count]) => count),
-            backgroundColor: "rgba(75, 192, 192, 0.6)",
+            backgroundColor: backgroundColors,
+            borderColor: backgroundColors.map((color) =>
+              color.replace("0.6", "1")
+            ),
+            borderWidth: 1,
           },
         ],
       };
@@ -80,16 +105,72 @@ const QuestionAnalysis = () => {
         },
         title: {
           display: true,
-          text: "Most Frequent Words in Questions",
+          text: "질문 단어 빈도수 분석",
+          font: {
+            size: 20,
+            weight: "bold",
+          },
+          color: "#333",
         },
+        tooltip: {
+          callbacks: {
+            label: function (context) {
+              return `빈도수: ${context.parsed.y}`;
+            },
+          },
+        },
+      },
+      scales: {
+        y: {
+          beginAtZero: true,
+          title: {
+            display: true,
+            text: "빈도수",
+            font: {
+              size: 14,
+              weight: "bold",
+            },
+          },
+        },
+        x: {
+          title: {
+            display: true,
+            text: "단어",
+            font: {
+              size: 14,
+              weight: "bold",
+            },
+          },
+        },
+      },
+      animation: {
+        duration: 2000,
+        easing: "easeInOutQuart",
       },
     }),
     []
   );
 
   return (
-    <div>
-      <h2>Question Content Analysis</h2>
+    <div
+      style={{
+        backgroundColor: "#f0f0f0",
+        padding: "20px",
+        borderRadius: "10px",
+        boxShadow: "0 4px 8px rgba(0,0,0,0.1)",
+      }}
+    >
+      <h2
+        style={{
+          textAlign: "center",
+          color: "#333",
+          marginBottom: "20px",
+          fontSize: "24px",
+          fontWeight: "bold",
+        }}
+      >
+        질문 단어 빈도수 체크
+      </h2>
       {chartData && <Bar options={options} data={chartData} />}
     </div>
   );
