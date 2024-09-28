@@ -45,6 +45,12 @@ const RoomListPage = () => {
     console.log("Entering room:", roomId);
   };
 
+  const handleEnterSurvey = (roomId) => {
+    localStorage.setItem("roomId", roomId);
+    navigate("/survey");
+    console.log("Entering Survey:", roomId);
+  };
+
   const formatDate = (dateArray) => {
     const [year, month, day, hour, minute] = dateArray;
     return `${year}.${String(month).padStart(2, "0")}.${String(day).padStart(2, "0")} ${String(hour).padStart(2, "0")}:${String(minute).padStart(2, "0")}`;
@@ -89,6 +95,12 @@ const RoomListPage = () => {
                   onClick={() => handleEnterRoom(room.id)}
                 >
                   방 들어가기
+                </button>
+                <button
+                  className={styles.enterButton}
+                  onClick={() => handleEnterSurvey(room.id)}
+                >
+                  분석하러 가기
                 </button>
               </td>
             </tr>

@@ -1,73 +1,98 @@
-import React from "react";
-import styles from "./surveyPage.module.css"; // 모듈 CSS로 가져오기
-import starImage from "./star.png"; // star.png를 import
+import React, { useState, useEffect, useMemo, useCallback } from "react";
+import { Bar } from "react-chartjs-2";
+import {
+  Chart as ChartJS,
+  CategoryScale,
+  LinearScale,
+  BarElement,
+  Title,
+  Tooltip,
+  Legend,
+} from "chart.js";
+import * as roomAPI from "../../api/room/room";
 
-const SurveyPage = () => {
+ChartJS.register(
+  CategoryScale,
+  LinearScale,
+  BarElement,
+  Title,
+  Tooltip,
+  Legend
+);
+
+const QuestionAnalysis = () => {
+  const [questions, setQuestions] = useState([]);
+  const roomId = localStorage.getItem("roomId");
+  const getQuestions = useCallback(async () => {
+    try {
+      const response = await roomAPI.getQuestions(roomId);
+      setQuestions(response.data.data);
+    } catch (error) {
+      console.error("Failed to get questions:", error);
+    }
+  }, [roomId]);
+
+  useEffect(() => {
+    getQuestions();
+  }, [getQuestions]);
+
+  const wordFrequency = useMemo(() => {
+    const wordCount = {};
+    questions.forEach((question) => {
+      const words = (question.title + " " + question.content)
+        .toLowerCase()
+        .split(/\s+/);
+      words.forEach((word) => {
+        if (word.length > 2) {
+          wordCount[word] = (wordCount[word] || 0) + 1;
+        }
+      });
+    });
+    return wordCount;
+  }, [questions]);
+
+  const chartData = useMemo(() => {
+    if (Object.keys(wordFrequency).length > 0) {
+      const sortedWords = Object.entries(wordFrequency)
+        .sort((a, b) => b[1] - a[1])
+        .slice(0, 20);
+
+      return {
+        labels: sortedWords.map(([word]) => word),
+        datasets: [
+          {
+            label: "Word Frequency",
+            data: sortedWords.map(([, count]) => count),
+            backgroundColor: "rgba(75, 192, 192, 0.6)",
+          },
+        ],
+      };
+    }
+    return null;
+  }, [wordFrequency]);
+
+  const options = useMemo(
+    () => ({
+      responsive: true,
+      plugins: {
+        legend: {
+          position: "top",
+        },
+        title: {
+          display: true,
+          text: "Most Frequent Words in Questions",
+        },
+      },
+    }),
+    []
+  );
+
   return (
     <div>
-      <header className={styles.header}></header>
-
-      <div className={styles.titleContainer}>
-        <div className={styles.seminarTitle}>구름톤 세미나</div>
-        <div className={styles.currentRespondents}>현재 응답 인원: 21</div>
-      </div>
-
-      <main className={styles.content}>
-        <table>
-          <thead>
-            <tr>
-              <th>질문 목록</th>
-              <th className={styles.grayText}>평점</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr>
-              <td>1. 세미나의 진행 속도가 적절했습니다.</td>
-              <td>
-                <img src={starImage} alt="별" className={styles.star} /> 4.1
-              </td>
-            </tr>
-            <tr>
-              <td>2. 세미나 내용이 명확하고 이해하기 쉬웠습니다.</td>
-              <td>
-                <img src={starImage} alt="별" className={styles.star} /> 4.1
-              </td>
-            </tr>
-            <tr>
-              <td>3. 세미나 발표자의 전달 방식이 효과적이었습니다.</td>
-              <td>
-                <img src={starImage} alt="별" className={styles.star} /> 4.1
-              </td>
-            </tr>
-            <tr>
-              <td>4. 세미나에서 다룬 주제가 유익하고 실용적이었습니다.</td>
-              <td>
-                <img src={starImage} alt="별" className={styles.star} /> 4.1
-              </td>
-            </tr>
-            <tr>
-              <td>
-                5. 세미나 환경(장소, 음향, 실내온도 등)이 만족스러웠습니다.
-              </td>
-              <td>
-                <img src={starImage} alt="별" className={styles.star} /> 4.1
-              </td>
-            </tr>
-          </tbody>
-        </table>
-
-        <div className={styles.bigRatingContainer}>
-          <div className={styles.bigRating}>
-            <img src={starImage} alt="큰 별" className={styles.bigStar} />{" "}
-            {/* 큰 별 */}
-            4.1 <span className={styles.maxRating}>/5.0</span>
-          </div>
-        </div>
-
-        <button className={styles.button}>강의실로 돌아가기</button>
-      </main>
+      <h2>Question Content Analysis</h2>
+      {chartData && <Bar options={options} data={chartData} />}
     </div>
   );
 };
 
-export default SurveyPage;
+export default React.memo(QuestionAnalysis);
