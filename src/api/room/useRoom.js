@@ -26,9 +26,9 @@ export const useRoom = () => {
   };
 
   const getGuests = async (roomId) => {
-    const data = await roomAPI.getGuests(roomId);
-    console.log(data);
-    setActiveUsers(data.data);
+    const response = await roomAPI.getGuests(roomId);
+    console.log(response);
+    setActiveUsers(response.data.data);
   };
 
   const makeRoom = async (name, date, location, like_threshold) => {

@@ -17,7 +17,8 @@ export const makeRoom = async (name, date, location, like_threshold) => {
 
 //수강자가 참여자 목록을 얻을 때,
 export const getGuests = async (roomId) => {
-  sendRequest(userRoomsIntance, "get", `/${roomId}/guests`);
+  const response = sendRequest(userRoomsIntance, "get", `/${roomId}/guests`);
+  return response;
 };
 
 //강연자가 방목록을 얻을 때,
