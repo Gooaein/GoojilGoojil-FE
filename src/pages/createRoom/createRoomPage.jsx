@@ -24,7 +24,7 @@ const CreateRoom = () => {
     if (!accessToken) {
       navigate("/login");
     }
-  }, []);
+  }, [accessToken, navigate]);
   async function handleCreateButton() {
     try {
       // makeRoom 함수 호출

@@ -159,7 +159,7 @@ const useChattingRoom = (roomId, userId, isUseEffectOn) => {
         userId: userId,
       });
     },
-    [userId, sendMessage]
+    [userId, sendMessage, roomId]
   );
 
   useEffect(() => {
