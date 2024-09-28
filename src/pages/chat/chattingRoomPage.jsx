@@ -16,6 +16,7 @@ import useRoom from "../../api/room/useRoom";
 
 const CLOUD_WIDTH = 150;
 const CLOUD_HEIGHT = 100;
+const MIN_DISTANCE = Math.sqrt(CLOUD_WIDTH ** 2 + CLOUD_HEIGHT ** 2);
 
 const ChattingRoomPage = () => {
   const { getGuests, getQuestions } = useRoom();
@@ -53,13 +54,44 @@ const ChattingRoomPage = () => {
     return { x, y };
   }, [viewportSize.width, viewportSize.height]);
 
+  const isPositionValid = useCallback((newPos, existingPositions) => {
+    return !existingPositions.some((pos) => {
+      const distance = Math.sqrt(
+        (newPos.x - pos.x) ** 2 + (newPos.y - pos.y) ** 2
+      );
+      return distance < MIN_DISTANCE;
+    });
+  }, []);
+
+  const findValidPosition = useCallback(
+    (existingPositions) => {
+      let newPos;
+      let attempts = 0;
+      const maxAttempts = 100;
+
+      do {
+        newPos = getRandomPosition();
+        attempts++;
+      } while (
+        !isPositionValid(newPos, existingPositions) &&
+        attempts < maxAttempts
+      );
+
+      return newPos;
+    },
+    [getRandomPosition, isPositionValid]
+  );
+
   useEffect(() => {
+    const positionsArray = Object.values(cloudPositionsRef.current);
     questions.forEach((question) => {
       if (!cloudPositionsRef.current[question.questionId]) {
-        cloudPositionsRef.current[question.questionId] = getRandomPosition();
+        const newPosition = findValidPosition(positionsArray);
+        cloudPositionsRef.current[question.questionId] = newPosition;
+        positionsArray.push(newPosition);
       }
     });
-  }, [questions, getRandomPosition]);
+  }, [questions, findValidPosition]);
 
   useEffect(() => {
     const fetchData = async () => {
