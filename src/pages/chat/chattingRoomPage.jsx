@@ -18,9 +18,8 @@ const CLOUD_WIDTH = 150;
 const CLOUD_HEIGHT = 100;
 
 const ChattingRoomPage = () => {
-  const roomId = "1";
-  const userId = "user123";
-  const { handleSendLike } = useChattingRoom(roomId, userId, true);
+  const roomId = localStorage.getItem("roomId");
+  const { handleSendLike } = useChattingRoom(roomId, true);
   const questions = useRecoilValue(questionsState);
   const [viewportSize, setViewportSize] = useState({ width: 0, height: 0 });
   const cloudPositionsRef = useRef({});
