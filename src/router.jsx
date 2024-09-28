@@ -10,13 +10,18 @@ import LoginPage from "./pages/login/loginPage";
 import CreateRoomPage from "./pages/createRoom/createRoomPage";
 import RoomListPage from "./pages/list/roomListPage";
 import SpeakerRoomPage from "./pages/speakerRoom/speakerRoomPage";
+import { StompProvider } from "./context/StompContext";
 
 const AppRouter = () => (
   <Router>
     <Header />
     <Routes>
       <Route path="/" element={<IntroPage />} />
-      <Route path="/chattingRoom" element={<ChattingRoomPage />} />
+      <StompProvider>
+        <Route path="/chattingRoom" element={<ChattingRoomPage />} />
+        <Route path="/speakerRoom" element={<SpeakerRoomPage />} />
+      </StompProvider>
+
       <Route path="/customize" element={<CustomizingPage />} />
       <Route path="/survey" element={<SurveyPage />} />
       <Route path="/login" element={<LoginPage />} />
@@ -24,7 +29,6 @@ const AppRouter = () => (
       <Route path="/:uuid/customize" element={<CustomizingPage />} />
       <Route path="/createRoom" element={<CreateRoomPage />} />
       <Route path="/list" element={<RoomListPage />} />
-      <Route path="/speakerRoom" element={<SpeakerRoomPage />} />
       <Route path="*" element={<NotFoundPage />} />
     </Routes>
   </Router>
