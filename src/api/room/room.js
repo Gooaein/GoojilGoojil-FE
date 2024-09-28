@@ -6,7 +6,7 @@ export const getInitialRoomData = async (roomId) => {
 
 //TODO- 나중에 실제 roomId로 바꿔야 함.
 export const makeRoom = async (name, date, location, like_threshold) => {
-  const data = sendRequest(userRoomsIntance, "post", ``, {
+  const data = await sendRequest(userRoomsIntance, "post", ``, {
     name,
     date,
     location,

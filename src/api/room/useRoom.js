@@ -91,7 +91,7 @@ export const useRoom = () => {
     try {
       const data = await sendAvatar(avatar_base64, uuid);
       console.log("avatar", data);
-      localStorage.setItem("roomId", data.roomId);
+      localStorage.setItem("roomId", data.data.data.roomId);
     } catch (error) {
       console.error("Failed to post Avatar:", error);
     }
