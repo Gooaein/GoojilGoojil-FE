@@ -16,12 +16,10 @@ const ChattingRoomPage = () => {
   const { handleSendLike } = useChattingRoom(roomId, true);
   const questions = useRecoilValue(questionsState);
   const [viewportSize, setViewportSize] = useState({ width: 0, height: 0 });
-  const cloudPositionsRef = useRef({});
+  const [cloudPositions, setCloudPositions] = useState({});
   const { getQuestions, getGuests } = useRoom();
   const dataFetchedRef = useRef(false);
   const navigate = useNavigate();
-  const [cloudPositions, setCloudPositions] = useState({});
-
   const { uuid } = useParams();
 
   const updateViewportSize = useCallback(() => {
@@ -56,7 +54,7 @@ const ChattingRoomPage = () => {
 
   const getRandomPosition = useCallback(() => {
     const padding = 20;
-    const inputHeight = 100; // Height of ChattingInput
+    const inputHeight = 100;
     const availableHeight =
       viewportSize.height - inputHeight - CLOUD_HEIGHT - padding;
 
@@ -76,12 +74,12 @@ const ChattingRoomPage = () => {
     );
   }, []);
 
-  const updateCloudPositions = useCallback(() => {
-    const newPositions = { ...cloudPositions };
-    const existingPositions = Object.values(newPositions);
+  useEffect(() => {
+    const newPositions = {};
+    const existingPositions = [];
 
     questions.forEach((question) => {
-      if (!newPositions[question.questionId]) {
+      if (!cloudPositions[question.questionId]) {
         let position;
         let attempts = 0;
         const maxAttempts = 50;
@@ -96,15 +94,14 @@ const ChattingRoomPage = () => {
 
         newPositions[question.questionId] = position;
         existingPositions.push(position);
+      } else {
+        newPositions[question.questionId] = cloudPositions[question.questionId];
+        existingPositions.push(cloudPositions[question.questionId]);
       }
     });
 
     setCloudPositions(newPositions);
   }, [questions, getRandomPosition, checkOverlap, cloudPositions]);
-
-  useEffect(() => {
-    updateCloudPositions();
-  }, [updateCloudPositions, questions]);
 
   return (
     <div className={styles.container}>
@@ -116,8 +113,8 @@ const ChattingRoomPage = () => {
             handleSendLike={handleSendLike}
             style={{
               position: "absolute",
-              left: `${cloudPositionsRef.current[question.questionId]?.x}px`,
-              top: `${cloudPositionsRef.current[question.questionId]?.y}px`,
+              left: `${cloudPositions[question.questionId]?.x}px`,
+              top: `${cloudPositions[question.questionId]?.y}px`,
               width: `${CLOUD_WIDTH}px`,
               height: `${CLOUD_HEIGHT}px`,
             }}
