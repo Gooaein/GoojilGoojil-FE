@@ -3,29 +3,27 @@ import styles from "./roomListPage.module.css";
 import copyIcon from "./copy.png";
 import useRoom from "../../api/room/useRoom";
 import { useNavigate } from "react-router-dom";
-import { useRecoilState } from "recoil";
+import { useRecoilValue } from "recoil";
 import { roomsState } from "../../recoil/room-atoms";
 
 const RoomListPage = () => {
   const { getRooms } = useRoom();
   const navigate = useNavigate();
-  const [rooms, setRooms] = useRecoilState(roomsState);
+  const rooms = useRecoilValue(roomsState);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
   const fetchRooms = useCallback(async () => {
     try {
       setLoading(true);
-      const fetchedRooms = await getRooms();
-      setRooms(fetchedRooms);
-      console.log(fetchedRooms);
+      await getRooms();
     } catch (error) {
       console.error("Error fetching rooms:", error);
       setError("방 목록을 불러오는 데 실패했습니다.");
     } finally {
       setLoading(false);
     }
-  }, [getRooms, setRooms]);
+  }, [getRooms]);
 
   useEffect(() => {
     fetchRooms();
