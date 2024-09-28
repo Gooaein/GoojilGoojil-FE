@@ -51,23 +51,23 @@ const ChattingRoomPage = () => {
     window.addEventListener("resize", updateViewportSize);
     return () => window.removeEventListener("resize", updateViewportSize);
   }, [updateViewportSize]);
-
   const getRandomPosition = useCallback(
     (existingPositions) => {
       const padding = 30;
       let attempts = 0;
       const maxAttempts = 100;
 
-      const bottomAreaStart = viewportSize.height * 0.75;
-      const bottomAreaHeight = viewportSize.height * 0.25;
+      // Use more of the screen's height
+      const topAreaStart = viewportSize.height * 0.1; // Start from 10% of the screen height
+      const availableHeight = viewportSize.height * 0.8; // Use 80% of the screen height
 
       while (attempts < maxAttempts) {
         const x =
           Math.random() * (viewportSize.width - CLOUD_WIDTH - padding * 2) +
           padding;
         const y =
-          bottomAreaStart +
-          Math.random() * (bottomAreaHeight - CLOUD_HEIGHT - padding);
+          topAreaStart +
+          Math.random() * (availableHeight - CLOUD_HEIGHT - padding);
 
         const overlap = existingPositions.some(
           (pos) =>
@@ -82,9 +82,10 @@ const ChattingRoomPage = () => {
         attempts++;
       }
 
+      // Fallback position if no non-overlapping position is found
       return {
         x: Math.random() * (viewportSize.width - CLOUD_WIDTH),
-        y: bottomAreaStart + Math.random() * (bottomAreaHeight - CLOUD_HEIGHT),
+        y: topAreaStart + Math.random() * (availableHeight - CLOUD_HEIGHT),
       };
     },
     [viewportSize.width, viewportSize.height]
