@@ -18,8 +18,8 @@
     align-items: center;
     padding: 10px 15px;
     cursor: pointer;
-    background-color: #577ef5;
-    color: white;
+    background-color: #ffffff;
+    color: rgb(0, 0, 0);
   }
   
   .header h3 {
