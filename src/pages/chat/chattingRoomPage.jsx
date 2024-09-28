@@ -22,6 +22,7 @@ const ChattingRoomPage = () => {
 
   const { getGuests, getQuestions } = useRoom();
   const dataFetchedRef = useRef(false);
+  const positionsGeneratedRef = useRef(false);
   const navigate = useNavigate();
   const { uuid } = useParams();
 
@@ -59,30 +60,38 @@ const ChattingRoomPage = () => {
   }, [roomId, getQuestions, getGuests, navigate, uuid]);
 
   useEffect(() => {
-    setCloudPositions((prevPositions) => {
-      const newPositions = { ...prevPositions };
-      questions.forEach((question) => {
-        if (!newPositions[question.questionId]) {
-          newPositions[question.questionId] = generateRandomPosition();
-        }
+    if (!positionsGeneratedRef.current && containerRef.current) {
+      setCloudPositions((prevPositions) => {
+        const newPositions = { ...prevPositions };
+        questions.forEach((question) => {
+          if (!newPositions[question.questionId]) {
+            newPositions[question.questionId] = generateRandomPosition();
+          }
+        });
+        positionsGeneratedRef.current = true;
+        return newPositions;
       });
-      return newPositions;
-    });
+    }
   }, [questions, generateRandomPosition]);
 
   const memoizedQuestionClouds = useMemo(() => {
-    return questions.map((question) => (
-      <QuestionCloud
-        key={question.questionId}
-        question={question}
-        handleSendLike={handleSendLike}
-        style={{
-          position: "absolute",
-          left: `${cloudPositions[question.questionId]?.x}px`,
-          top: `${cloudPositions[question.questionId]?.y}px`,
-        }}
-      />
-    ));
+    return questions.map((question) => {
+      const position = cloudPositions[question.questionId];
+      if (!position) return null; // 위치가 아직 할당되지 않은 경우 렌더링하지 않음
+
+      return (
+        <QuestionCloud
+          key={question.questionId}
+          question={question}
+          handleSendLike={handleSendLike}
+          style={{
+            position: "absolute",
+            left: `${position.x}px`,
+            top: `${position.y}px`,
+          }}
+        />
+      );
+    });
   }, [questions, cloudPositions, handleSendLike]);
 
   return (
