@@ -35,7 +35,7 @@ export const getQuestions = async (roomId) => {
 
 //강연자가 방목록을 얻을 때,
 export const getRooms = async (roomId) => {
-  const response = await sendRequest(userRoomsIntance, "get", ``, roomId);
+  const response = sendRequest(userRoomsIntance, "get", ``, roomId);
   return response;
 };
 
