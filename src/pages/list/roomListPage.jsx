@@ -3,17 +3,19 @@ import styles from "./roomListPage.module.css";
 import copyIcon from "./copy.png";
 import useRoom from "../../api/room/useRoom";
 import { useNavigate } from "react-router-dom";
-import { useRecoilState } from "recoil";
+import { useRecoilValue } from "recoil";
 import { roomsState } from "../../recoil/room-atoms";
 
 const RoomListPage = () => {
   const { getRooms } = useRoom();
   const navigate = useNavigate();
-  const rooms = useRecoilState(roomsState);
+  const rooms = useRecoilValue(roomsState);
+
   useEffect(() => {
     const fetchRooms = async () => {
       try {
-        await getRooms();
+        const fetchedRooms = await getRooms();
+        console.log(fetchedRooms);
       } catch (error) {
         console.error("Error fetching rooms:", error);
       }
@@ -31,16 +33,9 @@ const RoomListPage = () => {
   };
 
   const handleEnterRoom = (roomId) => {
-    // 방 입장 로직 구현
     navigate("/speakerRoom");
     console.log("Entering room:", roomId);
   };
-
-  // const handleViewStatistics = (roomId) => {
-  //   // 통계 보기 로직 구현
-  //   navigate("/");
-  //   console.log("Viewing statistics for room:", roomId);
-  // };
 
   const formatDate = (dateArray) => {
     const [year, month, day, hour, minute] = dateArray;
@@ -65,6 +60,7 @@ const RoomListPage = () => {
           {rooms.map((room) => (
             <tr key={room.id}>
               <td>{room.name}</td>
+              <td>{room.lectureName}</td>
               <td>{formatDate(room.date)}</td>
               <td>{room.location}</td>
               <td>
@@ -83,12 +79,6 @@ const RoomListPage = () => {
                 >
                   방 들어가기
                 </button>
-                {/* <button
-                  className={styles.statsButton}
-                  onClick={() => handleViewStatistics(room.id)}
-                >
-                  통계보기
-                </button> */}
               </td>
             </tr>
           ))}
