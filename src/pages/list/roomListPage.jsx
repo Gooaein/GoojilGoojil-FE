@@ -23,13 +23,14 @@ const RoomListPage = () => {
       } catch (error) {
         console.error("Error fetching rooms:", error);
         setError("방 목록을 불러오는 데 실패했습니다.");
+        navigate("/login");
       } finally {
         setLoading(false);
       }
     };
 
     fetchRooms();
-  }, [getRooms, setRooms]);
+  }, [getRooms, setRooms, navigate]);
 
   const copyUrlToClipboard = (url) => {
     const fullUrl = `https://goojilgoojil.com/${url}/customize`;
