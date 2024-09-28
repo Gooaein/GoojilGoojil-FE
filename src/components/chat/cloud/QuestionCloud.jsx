@@ -73,12 +73,12 @@ export const QuestionCloud = React.memo(
     };
 
     const { View: LottieView, play } = useLottie(lottieOptions, {
-      height: "100%",
+      height: "600%",
       width: "100%",
     });
 
     useEffect(() => {
-      if (question.likeCount >= 5 && !showAnimation) {
+      if (question.likeCount >= 3 && !showAnimation) {
         setShowAnimation(true);
         play();
       }
