@@ -20,10 +20,11 @@ const RoomListPage = () => {
     } catch (error) {
       console.error("Error fetching rooms:", error);
       setError("방 목록을 불러오는 데 실패했습니다.");
+      navigate("/login");
     } finally {
       setLoading(false);
     }
-  }, [getRooms]);
+  }, [getRooms, navigate]);
 
   useEffect(() => {
     fetchRooms();
