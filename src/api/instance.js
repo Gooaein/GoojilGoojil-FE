@@ -15,6 +15,7 @@ exampleInstance.defaults.baseURL += "/example";
 
 const roomsInstance = axios.create({
   baseURL: `${BASE_URL}/api/v1/rooms`,
+  withCredentials: true,
 });
 
 //userRoomsInstance 로 Interceptor를 적용한다.

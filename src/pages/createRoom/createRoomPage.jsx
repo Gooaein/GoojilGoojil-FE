@@ -64,7 +64,6 @@ const CreateRoom = () => {
           value={roomName}
           onChange={(e) => setRoomName(e.target.value)}
         />
-        <div className={styles.requiredText}>*필수 질문입니다</div>
       </div>
 
       <div className={styles.inputGroup}>
