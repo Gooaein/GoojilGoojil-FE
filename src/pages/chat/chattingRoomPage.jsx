@@ -1,4 +1,10 @@
-import React, { useEffect, useCallback, useRef, useState } from "react";
+import React, {
+  useEffect,
+  useCallback,
+  useRef,
+  useState,
+  useMemo,
+} from "react";
 import styles from "./chattingRoomPage.module.css";
 import { QuestionCloud } from "../../components/chat/cloud/QuestionCloud";
 import { ChattingInput } from "../../components/chat/input/ChattingInput";
@@ -21,7 +27,7 @@ const ChattingRoomPage = () => {
 
   const containerRef = useRef(null);
 
-  const generateRandomPosition = useCallback((questionId) => {
+  const generateRandomPosition = useCallback(() => {
     if (containerRef.current) {
       const containerWidth = containerRef.current.offsetWidth;
       const containerHeight = containerRef.current.offsetHeight;
@@ -53,34 +59,36 @@ const ChattingRoomPage = () => {
   }, [roomId, getQuestions, getGuests, navigate, uuid]);
 
   useEffect(() => {
-    const newPositions = {};
-    questions.forEach((question) => {
-      if (!cloudPositions[question.questionId]) {
-        newPositions[question.questionId] = generateRandomPosition(
-          question.questionId
-        );
-      } else {
-        newPositions[question.questionId] = cloudPositions[question.questionId];
-      }
+    setCloudPositions((prevPositions) => {
+      const newPositions = { ...prevPositions };
+      questions.forEach((question) => {
+        if (!newPositions[question.questionId]) {
+          newPositions[question.questionId] = generateRandomPosition();
+        }
+      });
+      return newPositions;
     });
-    setCloudPositions(newPositions);
-  }, [questions, generateRandomPosition, cloudPositions]);
+  }, [questions, generateRandomPosition]);
+
+  const memoizedQuestionClouds = useMemo(() => {
+    return questions.map((question) => (
+      <QuestionCloud
+        key={question.questionId}
+        question={question}
+        handleSendLike={handleSendLike}
+        style={{
+          position: "absolute",
+          left: `${cloudPositions[question.questionId]?.x}px`,
+          top: `${cloudPositions[question.questionId]?.y}px`,
+        }}
+      />
+    ));
+  }, [questions, cloudPositions, handleSendLike]);
 
   return (
     <div className={styles.container}>
       <div ref={containerRef} className={styles.cloudContainer}>
-        {questions.map((question) => (
-          <QuestionCloud
-            key={question.questionId}
-            question={question}
-            handleSendLike={handleSendLike}
-            style={{
-              position: "absolute",
-              left: `${cloudPositions[question.questionId]?.x}px`,
-              top: `${cloudPositions[question.questionId]?.y}px`,
-            }}
-          />
-        ))}
+        {memoizedQuestionClouds}
       </div>
       <ChattingInput />
     </div>
