@@ -16,18 +16,35 @@ const getOpacity = (remainingTime) => {
   return Math.max(minOpacity, Math.min(maxOpacity, opacity));
 };
 
+const getCloudSize = (likeCount) => {
+  const baseSize = 100; // 기본 크기 (px)
+  const maxSize = 200; // 최대 크기 (px)
+  const growthFactor = 5; // 좋아요 1개당 증가하는 크기 (px)
+
+  const size = baseSize + likeCount * growthFactor;
+  return Math.min(size, maxSize);
+};
+
 export const QuestionCloud = React.memo(
   ({ question, handleSendLike, style, ...props }) => {
     const [isModalOpen, setIsModalOpen] = useState(false);
 
-    const cloudStyle = useMemo(
-      () => ({
+    const cloudStyle = useMemo(() => {
+      const size = getCloudSize(question.likeCount);
+      return {
         ...style,
         opacity: getOpacity(question.remainingTime),
         backgroundImage: `url(${chatCloudImage})`,
-      }),
-      [question.remainingTime, style]
-    );
+        width: `${size}px`,
+        height: `${size}px`,
+        backgroundSize: "contain",
+        backgroundRepeat: "no-repeat",
+        backgroundPosition: "center",
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+      };
+    }, [question.remainingTime, question.likeCount, style]);
 
     const toggleModal = useCallback(() => {
       setIsModalOpen((prev) => !prev);
@@ -65,7 +82,7 @@ export const QuestionCloud = React.memo(
                 <h2 className={styles.modalTitle}>{question.title}</h2>
                 <p className={styles.modalBody}>{question.content}</p>
                 <button onClick={onLikeClick} className={styles.likeButton}>
-                  👍 공감 ({question.like_count || 0})
+                  👍 공감 ({question.likeCount || 0})
                 </button>
               </div>
             </div>

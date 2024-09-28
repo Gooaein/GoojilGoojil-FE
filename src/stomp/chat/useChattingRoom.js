@@ -46,12 +46,12 @@ const useChattingRoom = (roomId, userId, isUseEffectOn) => {
     (likeData) => {
       setQuestions((prev) =>
         prev.map((question) =>
-          question.question_id === likeData.question_id
-            ? { ...question, like_count: likeData.like_count }
+          question.questionId === likeData.questionId
+            ? { ...question, likeCount: likeData.likeCount }
             : question
         )
       );
-      resetQuestionTimer(likeData.question_id);
+      resetQuestionTimer(likeData.questionId);
     },
     [setQuestions, resetQuestionTimer]
   );
