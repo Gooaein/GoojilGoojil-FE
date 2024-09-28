@@ -1,10 +1,4 @@
-import React, {
-  useMemo,
-  useEffect,
-  useState,
-  useCallback,
-  useRef,
-} from "react";
+import React, { useEffect, useState, useCallback, useRef } from "react";
 import styles from "./chattingRoomPage.module.css";
 import { QuestionCloud } from "../../components/chat/cloud/QuestionCloud";
 import { ChattingInput } from "../../components/chat/input/ChattingInput";
@@ -23,6 +17,7 @@ const ChattingRoomPage = () => {
   const [viewportSize, setViewportSize] = useState({ width: 0, height: 0 });
   const cloudPositionsRef = useRef({});
   const { getQuestions, getGuests } = useRoom();
+  const dataFetchedRef = useRef(false);
 
   const updateViewportSize = useCallback(() => {
     setViewportSize({
@@ -32,9 +27,10 @@ const ChattingRoomPage = () => {
   }, []);
 
   useEffect(() => {
-    if (roomId) {
+    if (roomId && !dataFetchedRef.current) {
       getQuestions(roomId);
       getGuests(roomId);
+      dataFetchedRef.current = true;
     }
   }, [roomId, getQuestions, getGuests]);
 
@@ -82,7 +78,7 @@ const ChattingRoomPage = () => {
     [viewportSize.width, viewportSize.height]
   );
 
-  useMemo(() => {
+  useEffect(() => {
     questions.forEach((question) => {
       if (!cloudPositionsRef.current[question.questionId]) {
         const existingPositions = Object.values(cloudPositionsRef.current);
