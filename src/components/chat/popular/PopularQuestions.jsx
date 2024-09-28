@@ -39,7 +39,7 @@ export const PopularQuestions = () => {
               <br />
               <div className={styles.questionContent}>{question.content}</div>
               <div className={styles.likeCount}>
-                <span>{question.likeCount}</span>
+                <span>{question.likeCount}+</span>
               </div>
             </div>
           ))
