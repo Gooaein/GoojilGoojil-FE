@@ -7,9 +7,10 @@ import { useRecoilValue } from "recoil";
 import { questionsState } from "../../recoil/chat-atoms";
 import useRoom from "../../api/room/useRoom";
 import { useNavigate, useParams } from "react-router-dom";
+
 const CHATTING_INPUT_HEIGHT = 100;
 const PADDING = 20;
-const GRID_SIZE = 50; // Size of each grid cell
+const GRID_SIZE = 50;
 
 const ChattingRoomPage = () => {
   const roomId = localStorage.getItem("roomId");
@@ -20,7 +21,7 @@ const ChattingRoomPage = () => {
   const positionsCalculatedRef = useRef(false);
 
   const { getGuests, getQuestions } = useRoom();
-  const dataFetchedRef = useRef(null);
+  const dataFetchedRef = useRef(false);
   const navigate = useNavigate();
   const { uuid } = useParams();
 
@@ -78,12 +79,13 @@ const ChattingRoomPage = () => {
   }, []);
 
   const updateCloudPositions = useCallback(() => {
-    if (positionsCalculatedRef.current) return; // Skip if positions are already calculated
+    if (positionsCalculatedRef.current) return;
 
     initializeGrid();
     const newPositions = {};
+
     questions.forEach((question) => {
-      if (!cloudPositions[question.questionId]) {
+      if (!newPositions[question.questionId]) {
         const position = getRandomPosition();
         if (position) {
           newPositions[question.questionId] = position;
@@ -92,18 +94,22 @@ const ChattingRoomPage = () => {
         newPositions[question.questionId] = cloudPositions[question.questionId];
       }
     });
+
     setCloudPositions(newPositions);
     positionsCalculatedRef.current = true;
   }, [questions, getRandomPosition, initializeGrid, cloudPositions]);
 
   useEffect(() => {
-    updateCloudPositions();
+    if (!positionsCalculatedRef.current) {
+      updateCloudPositions();
+    }
   }, [updateCloudPositions, questions]);
 
   useEffect(() => {
     const handleResize = () => {
-      positionsCalculatedRef.current = false; // Allow recalculation on resize
-      updateCloudPositions();
+      if (!positionsCalculatedRef.current) {
+        updateCloudPositions(); // Recalculate positions if they haven't been calculated yet
+      }
     };
 
     window.addEventListener("resize", handleResize);
