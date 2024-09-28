@@ -7,7 +7,6 @@ import { useRecoilValue } from "recoil";
 import { questionsState } from "../../recoil/chat-atoms";
 import useRoom from "../../api/room/useRoom";
 import { useNavigate, useParams } from "react-router-dom";
-
 const CHATTING_INPUT_HEIGHT = 100;
 const PADDING = 20;
 const GRID_SIZE = 50; // Size of each grid cell
@@ -18,6 +17,7 @@ const ChattingRoomPage = () => {
   const questions = useRecoilValue(questionsState);
   const [cloudPositions, setCloudPositions] = useState({});
   const gridRef = useRef({});
+  const positionsCalculatedRef = useRef(false);
 
   const { getGuests, getQuestions } = useRoom();
   const dataFetchedRef = useRef(null);
@@ -78,21 +78,36 @@ const ChattingRoomPage = () => {
   }, []);
 
   const updateCloudPositions = useCallback(() => {
+    if (positionsCalculatedRef.current) return; // Skip if positions are already calculated
+
     initializeGrid();
     const newPositions = {};
     questions.forEach((question) => {
-      const position = getRandomPosition();
-      if (position) {
-        newPositions[question.questionId] = position;
+      if (!cloudPositions[question.questionId]) {
+        const position = getRandomPosition();
+        if (position) {
+          newPositions[question.questionId] = position;
+        }
+      } else {
+        newPositions[question.questionId] = cloudPositions[question.questionId];
       }
     });
     setCloudPositions(newPositions);
-  }, [questions, getRandomPosition, initializeGrid]);
+    positionsCalculatedRef.current = true;
+  }, [questions, getRandomPosition, initializeGrid, cloudPositions]);
 
   useEffect(() => {
     updateCloudPositions();
-    window.addEventListener("resize", updateCloudPositions);
-    return () => window.removeEventListener("resize", updateCloudPositions);
+  }, [updateCloudPositions, questions]);
+
+  useEffect(() => {
+    const handleResize = () => {
+      positionsCalculatedRef.current = false; // Allow recalculation on resize
+      updateCloudPositions();
+    };
+
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
   }, [updateCloudPositions]);
 
   return (
