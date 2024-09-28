@@ -1,10 +1,9 @@
 import React, { useEffect, useState, useMemo } from "react";
-import styles from "./speakerRoomPage.module.css";
-import useChattingRoom from "../../stomp/chat/useChattingRoom";
-import heartImage from "./heart.png";
 import { useRecoilValue } from "recoil";
 import { roomDetailState } from "../../recoil/room-atoms";
+import useChattingRoom from "../../stomp/chat/useChattingRoom";
 import useRoom from "../../api/room/useRoom";
+import heartImage from "./heart.png";
 
 const SpeakerRoomPage = () => {
   const roomId = localStorage.getItem("roomId");
@@ -22,8 +21,7 @@ const SpeakerRoomPage = () => {
       }
     };
     fetchRoomDetail();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [roomId]);
+  }, [roomId, getRoomDetail]);
 
   const sortedQuestions = useMemo(() => {
     const threshold = roomDetail?.like_threshold || 0;
@@ -33,7 +31,6 @@ const SpeakerRoomPage = () => {
 
   useEffect(() => {
     setPersistentQuestions((prevQuestions) => {
-      // Update existing questions' like counts
       const updatedQuestions = prevQuestions.map((prevQ) => {
         const updatedQ = questions.find(
           (q) => q.questionId === prevQ.questionId
@@ -41,7 +38,6 @@ const SpeakerRoomPage = () => {
         return updatedQ ? { ...prevQ, likeCount: updatedQ.likeCount } : prevQ;
       });
 
-      // Add new questions
       const newQuestions = sortedQuestions
         .filter(
           (newQ) =>
@@ -80,31 +76,38 @@ const SpeakerRoomPage = () => {
   };
 
   return (
-    <div className={styles.container}>
+    <div className="container">
       {roomDetail && (
-        <div className={styles.roomInfo}>
+        <div className="roomInfo">
           <h1>{roomDetail.name}</h1>
-          <p>장소: {roomDetail.location}</p>
-          <p>일시: {formatDate(roomDetail.date)}</p>
-          <p>좋아요 기준: {roomDetail.like_threshold}</p>
+          <div className="infoGrid">
+            <div className="infoItem">
+              <span className="infoLabel">장소:</span>
+              <span className="infoValue">{roomDetail.location}</span>
+            </div>
+            <div className="infoItem">
+              <span className="infoLabel">일시:</span>
+              <span className="infoValue">{formatDate(roomDetail.date)}</span>
+            </div>
+            <div className="infoItem">
+              <span className="infoLabel">좋아요 기준:</span>
+              <span className="infoValue">{roomDetail.like_threshold}</span>
+            </div>
+          </div>
         </div>
       )}
-      <div className={styles.cardGrid}>
+      <div className="cardGrid">
         {persistentQuestions.map((question) => (
-          <div key={question.questionId} className={styles.card}>
+          <div key={question.questionId} className="card">
             <h2>{question.title}</h2>
             <p>{question.content}</p>
-            <div className={styles.buttonGroup}>
-              <button className={styles.likeButton}>
-                <img
-                  src={heartImage}
-                  alt="like"
-                  className={styles.heartImage}
-                />
+            <div className="buttonGroup">
+              <button className="likeButton">
+                <img src={heartImage} alt="like" className="heartImage" />
                 {question.likeCount}
               </button>
               <button
-                className={styles.confirmButton}
+                className="confirmButton"
                 onClick={() => handleConfirm(question.questionId)}
               >
                 확인
