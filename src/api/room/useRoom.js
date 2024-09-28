@@ -12,7 +12,7 @@ import { useNavigate } from "react-router-dom";
 import { activeUsersState, questionsState } from "../../recoil/chat-atoms";
 import { sendAvatar } from "./avatar";
 
-export const useRoom = async () => {
+export const useRoom = () => {
   const setRoomData = useSetRecoilState(roomDataState);
   const setReview = useSetRecoilState(reviewState);
   const setActiveUsers = useSetRecoilState(activeUsersState);
@@ -91,6 +91,7 @@ export const useRoom = async () => {
       console.error("Failed to get questions:", error);
     }
   };
+
   const postAvatar = async (avatar_base64, uuid) => {
     try {
       const data = await sendAvatar(avatar_base64, uuid);
