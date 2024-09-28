@@ -1,28 +1,35 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import styles from "./roomListPage.module.css";
 import copyIcon from "./copy.png";
 import useRoom from "../../api/room/useRoom";
 import { useNavigate } from "react-router-dom";
-import { useRecoilValue } from "recoil";
+import { useRecoilState } from "recoil";
 import { roomsState } from "../../recoil/room-atoms";
 
 const RoomListPage = () => {
   const { getRooms } = useRoom();
   const navigate = useNavigate();
-  const rooms = useRecoilValue(roomsState);
+  const [rooms, setRooms] = useRecoilState(roomsState);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
   useEffect(() => {
     const fetchRooms = async () => {
       try {
+        setLoading(true);
         const fetchedRooms = await getRooms();
+        setRooms(fetchedRooms);
         console.log(fetchedRooms);
       } catch (error) {
         console.error("Error fetching rooms:", error);
+        setError("방 목록을 불러오는 데 실패했습니다.");
+      } finally {
+        setLoading(false);
       }
     };
 
     fetchRooms();
-  }, [getRooms]);
+  }, [getRooms, setRooms]);
 
   const copyUrlToClipboard = (url) => {
     const fullUrl = `https://goojilgoojil.com/${url}/customize`;
@@ -41,6 +48,9 @@ const RoomListPage = () => {
     const [year, month, day, hour, minute] = dateArray;
     return `${year}.${String(month).padStart(2, "0")}.${String(day).padStart(2, "0")} ${String(hour).padStart(2, "0")}:${String(minute).padStart(2, "0")}`;
   };
+
+  if (loading) return <div>로딩 중...</div>;
+  if (error) return <div>{error}</div>;
 
   return (
     <div className={styles.container}>
