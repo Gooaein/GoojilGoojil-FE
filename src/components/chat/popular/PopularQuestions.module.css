@@ -1,75 +1,91 @@
 .container {
-    position: absolute;
-    top: 20px;
-    left: 20px;
-    background-color: rgba(255, 255, 255, 0.9);
-    border-radius: 8px;
-    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-    width: 300px;
-    max-width: calc(100% - 40px);
-    z-index: 1000;
-    transition: all 0.3s ease;
-    overflow: hidden;
-  }
-  
-  .header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 10px 15px;
-    cursor: pointer;
-    background-color: #ffffff;
-    color: rgb(0, 0, 0);
-  }
-  
-  .header h3 {
-    margin: 0;
-    font-size: 16px;
-  }
-  
-  .questionList {
-    max-height: 0;
-    overflow-y: auto;
-    transition: max-height 0.3s ease;
-  }
-  
-  .container.expanded .questionList {
-    max-height: 300px;
-  }
-  
-  .questionItem {
-    padding: 10px 15px;
-    border-bottom: 1px solid #e0e0e0;
-  }
-  
-  .questionItem:last-child {
-    border-bottom: none;
-  }
-  
-  .questionItem p {
-    margin: 0 0 5px 0;
-    font-size: 14px;
-  }
-  
-  .questionItem span {
-    font-size: 12px;
-    color: #666;
-  }
-  
-  /* 스크롤바 스타일 */
-  .questionList::-webkit-scrollbar {
-    width: 6px;
-  }
-  
-  .questionList::-webkit-scrollbar-track {
-    background: #f1f1f1;
-  }
-  
-  .questionList::-webkit-scrollbar-thumb {
-    background: #888;
-    border-radius: 3px;
-  }
-  
-  .questionList::-webkit-scrollbar-thumb:hover {
-    background: #555;
-  }
+  position: absolute;
+  top: 20px;
+  left: 20px;
+  background-color: #ffffff;
+  color: black;
+  border-radius: 20px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+  width: 300px;
+  max-width: calc(100% - 40px);
+  z-index: 1000;
+  transition: all 0.3s ease;
+  overflow: hidden;
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 15px 20px;
+  cursor: pointer;
+  background-color: #ffffff;
+  color: #000000;
+}
+
+.header h3 {
+  margin: 0;
+  font-size: 20px;
+  font-weight: bold;
+}
+
+.questionList {
+  max-height: 0;
+  overflow-y: auto;
+  transition: max-height 0.3s ease;
+  background-color: #ffffff;
+}
+
+.container.expanded .questionList {
+  max-height: 600px;
+}
+.questionTitle {
+  font-weight: bold;
+  border-bottom: 1px black;
+}
+.questionItem {
+  padding: 15px 20px;
+  border-bottom: 1px solid #e0e0e0;
+}
+
+.questionItem:last-child {
+  border-bottom: none;
+}
+
+.questionItem p {
+  margin: 0 0 10px 0;
+  font-size: 16px;
+  color: #333333;
+  line-height: 1.4;
+}
+
+.questionItem span {
+  font-size: 14px;
+  color: #ff4757;
+  display: flex;
+  align-items: center;
+}
+
+.questionItem span::before {
+  content: "♥";
+  margin-right: 5px;
+  color: #ff4757;
+}
+
+/* 스크롤바 스타일 */
+.questionList::-webkit-scrollbar {
+  width: 6px;
+}
+
+.questionList::-webkit-scrollbar-track {
+  background: #f1f1f1;
+}
+
+.questionList::-webkit-scrollbar-thumb {
+  background: #4a7dff;
+  border-radius: 3px;
+}
+
+.questionList::-webkit-scrollbar-thumb:hover {
+  background: #3a6ae0;
+}
