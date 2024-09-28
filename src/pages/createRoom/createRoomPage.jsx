@@ -5,6 +5,7 @@ import RoomComponent from "../../components/room/roomComponent";
 import useRoom from "../../api/room/useRoom";
 import useAuthCookies from "../../hooks/useAuthCookies";
 import { useNavigate } from "react-router-dom";
+import { formatDateToISO } from "../../util/currentTimeUtil";
 
 const CreateRoom = () => {
   const [modalOpen, setModalOpen] = useState(false);
@@ -30,7 +31,12 @@ const CreateRoom = () => {
   async function handleCreateButton() {
     try {
       // makeRoom 함수 호출
-      await makeRoom(roomName, lectureDate, lecturePlace, likeThreshold);
+      await makeRoom(
+        roomName,
+        formatDateToISO(lectureDate),
+        lecturePlace,
+        likeThreshold
+      );
 
       // TODO: 실제 roomId로 URL을 생성해야 함
       const generatedUrl = `https://example.com/${roomName}`;
