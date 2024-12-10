@@ -61,7 +61,7 @@ const RoomListPage = () => {
 
   return (
     <div className={styles.container}>
-      <h1 className={styles.title}>구름톤 님의 강의실</h1>
+      <h1 className={styles.title}>강의실</h1>
       <table className={styles.table}>
         <thead>
           <tr>

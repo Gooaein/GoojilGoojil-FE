@@ -26,21 +26,7 @@ export const Header = () => {
     window.open(url, "_blank", "noopener,noreferrer");
   };
 
-  const navItems = [
-    { name: "홈", icon: Home, path: "/" },
-    {
-      name: "소개",
-      icon: Info,
-      path: "https://litt.ly/googilgoojil",
-      external: true,
-    },
-    {
-      name: "리틀리",
-      icon: Mail,
-      path: "https://litt.ly/googilgoojil",
-      external: true,
-    },
-  ];
+  const navItems = [{ name: "홈", icon: Home, path: "/" }];
 
   return (
     <>
