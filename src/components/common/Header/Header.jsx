@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Home, Info, Mail, Users } from "lucide-react";
+import { Home, Users } from "lucide-react";
 import { useRecoilValue } from "recoil";
 import { Link } from "react-router-dom";
 import styles from "./Header.module.css";
